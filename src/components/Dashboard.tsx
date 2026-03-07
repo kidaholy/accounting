@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { Shield } from 'lucide-react';
+import { Shield, TrendingUp, FileEdit, Briefcase, FileText, Package, Building } from 'lucide-react';
 import FixedAssetSchedule from './FixedAssetSchedule';
 import VatDeclaration from './VatDeclaration';
 import StockInventory from './StockInventory';
@@ -27,22 +27,22 @@ export default function Dashboard({ user }: DashboardProps) {
     await signOut({ callbackUrl: '/login' });
   };
 
-  let menuItems: { id: string, label: string, icon: string }[] = [];
+  let menuItems: { id: string, label: string, icon: React.ReactNode }[] = [];
 
   if (user.role === 'super_admin') {
     menuItems = [
-      { id: 'admin', label: 'Administration', icon: '🛡️' }
+      { id: 'admin', label: 'Administration', icon: <Shield size={18} strokeWidth={2.5} /> }
     ];
   } else {
     menuItems = [
-      { id: 'reports', label: 'Smart Reports', icon: '📈' },
-      { id: 'data-entry', label: 'Data Entry', icon: '📝' },
-      { id: 'assets', label: 'Fixed Assets', icon: '💎' },
-      { id: 'vat', label: 'VAT Declaration', icon: '📊' },
-      { id: 'inventory', label: 'Stock Inventory', icon: '📦' },
+      { id: 'reports', label: 'Smart Reports', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
+      { id: 'data-entry', label: 'Data Entry', icon: <FileEdit size={18} strokeWidth={2.5} /> },
+      { id: 'assets', label: 'Fixed Assets', icon: <Briefcase size={18} strokeWidth={2.5} /> },
+      { id: 'vat', label: 'VAT Declaration', icon: <FileText size={18} strokeWidth={2.5} /> },
+      { id: 'inventory', label: 'Stock Inventory', icon: <Package size={18} strokeWidth={2.5} /> },
     ];
     if (user.role === 'tenant_admin') {
-      menuItems.push({ id: 'tenant-admin', label: 'Tenant Admin', icon: '🏢' });
+      menuItems.push({ id: 'tenant-admin', label: 'Tenant Admin', icon: <Building size={18} strokeWidth={2.5} /> });
     }
   }
 
@@ -81,7 +81,7 @@ export default function Dashboard({ user }: DashboardProps) {
               className={`nav-item${activeTab === item.id ? ' active' : ''}`}
               onClick={() => setActiveTab(item.id)}
             >
-              <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: activeTab === item.id ? 1 : 0.6 }}>{item.icon}</div>
               {item.label}
             </button>
           ))}
