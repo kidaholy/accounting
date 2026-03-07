@@ -212,6 +212,10 @@ export default function LoginPage() {
               ))}
             </div>
           </div>
+
+          <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.875rem', color: '#7A7A7A' }}>
+            New to Hisabe? <Link href="/register" style={{ color: '#CB6843', fontWeight: 700, textDecoration: 'none' }}>Create an account</Link>
+          </div>
         </div>
       </div>
     </div>

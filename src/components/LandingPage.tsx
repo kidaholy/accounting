@@ -144,8 +144,11 @@ export default function LandingPage({ user }: LandingPageProps) {
             ))}
           </div>
 
-          {/* CTA */}
-          <Link href="/login" style={{ background: '#2A4A3E', color: 'white', padding: '0.625rem 1.5rem', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: '0.9375rem' }}>Login</Link>
+          {/* Links & CTA */}
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <Link href="/login" style={{ color: '#3D3D3D', textDecoration: 'none', fontWeight: 600, fontSize: '0.9375rem' }}>Login</Link>
+            <Link href="/register" style={{ background: '#2A4A3E', color: 'white', padding: '0.625rem 1.5rem', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: '0.9375rem', boxShadow: '0 4px 12px rgba(42,74,62,0.2)' }}>Sign Up</Link>
+          </div>
         </div>
       </nav>
 
@@ -168,11 +171,11 @@ export default function LandingPage({ user }: LandingPageProps) {
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link href="/login" style={{
+            <Link href="/register" style={{
               background: '#2A4A3E', color: 'white', padding: '0.875rem 2rem', borderRadius: 10,
               fontWeight: 700, textDecoration: 'none', fontSize: '1rem', boxShadow: '0 4px 14px rgba(42,74,62,0.3)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             }}>
-              Get Started
+              Get Started for Free
               <span style={{ fontSize: '1.1rem' }}>→</span>
             </Link>
             <a href="#features" style={{ border: '1.5px solid #D5D2C8', background: 'transparent', color: '#3D3D3D', padding: '0.875rem 1.75rem', borderRadius: 10, fontWeight: 600, textDecoration: 'none', fontSize: '1rem', display: 'inline-flex', alignItems: 'center' }}>
@@ -449,12 +452,12 @@ export default function LandingPage({ user }: LandingPageProps) {
               <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.9375rem' }}>Start your journey to stress-free bookkeeping today.</p>
             </div>
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <Link href={user ? '/dashboard' : '/login'} style={{
+              <Link href={user ? '/dashboard' : '/register'} style={{
                 background: '#CB6843', color: 'white', padding: '1rem 2.25rem',
                 borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: '1rem',
                 boxShadow: '0 4px 14px rgba(0,0,0,0.2)', display: 'inline-block',
               }}>
-                {user ? 'Open Dashboard' : 'Get Started Now'}
+                {user ? 'Open Dashboard' : 'Create Free Account'}
               </Link>
             </div>
           </div>

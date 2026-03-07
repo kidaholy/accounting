@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { Shield } from 'lucide-react';
 import FixedAssetSchedule from './FixedAssetSchedule';
 import VatDeclaration from './VatDeclaration';
 import StockInventory from './StockInventory';
@@ -151,10 +153,26 @@ export default function Dashboard({ user }: DashboardProps) {
           {activeTab === 'vat' && <VatDeclaration />}
           {activeTab === 'inventory' && <StockInventory />}
           {activeTab === 'admin' && user?.role === 'super_admin' && (
-            <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛡️</div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem' }}>Super Admin Panel</h2>
-              <p style={{ color: '#7A7A7A' }}>Manage tenants, users, and system-wide configuration.</p>
+            <div className="card" style={{ padding: '4rem 3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+              <Shield size={64} color="#3B82F6" />
+              <div>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem' }}>Super Admin Panel</h2>
+                <p style={{ color: '#7A7A7A', maxWidth: 400, margin: '0 auto' }}>Manage tenants, users, and system-wide configuration from the central management suite.</p>
+              </div>
+              <Link
+                href="/super-admin"
+                style={{
+                  background: '#2A4A3E',
+                  color: 'white',
+                  padding: '1rem 2rem',
+                  borderRadius: 12,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(42,74,62,0.2)'
+                }}
+              >
+                Go to Management Suite
+              </Link>
             </div>
           )}
           {activeTab === 'tenant-admin' && user?.role === 'tenant_admin' && (
