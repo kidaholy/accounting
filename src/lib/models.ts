@@ -6,8 +6,8 @@ const TenantSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String },
   address: { type: String },
-  subscriptionPlan: { 
-    type: String, 
+  subscriptionPlan: {
+    type: String,
     enum: ['free', 'basic', 'professional', 'enterprise'],
     default: 'free'
   },
@@ -77,6 +77,26 @@ const StockInventorySchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Transaction Schema (Core engine for Income Statement and VAT)
+const TransactionSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+  type: { type: String, enum: ['sale', 'purchase', 'expense'], required: true },
+  date: { type: Date, default: Date.now },
+  amount: { type: Number, required: true }, // Amount excluding VAT
+  vatAmount: { type: Number, default: 0 },
+  category: { type: String, required: true }, // e.g., 'Food Sales', 'Rent'
+  description: { type: String }
+});
+
+// Account Balance Schema (For Balance Sheet Snapshots)
+const AccountBalanceSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+  accountType: { type: String, enum: ['asset', 'liability', 'equity'], required: true },
+  name: { type: String, required: true }, // e.g., 'Cash at Bank', 'Accounts Receivable'
+  balance: { type: Number, default: 0 },
+  lastUpdated: { type: Date, default: Date.now }
+});
+
 // Audit Log Schema
 const AuditLogSchema = new mongoose.Schema({
   tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
@@ -95,4 +115,6 @@ export const User = mongoose.models.User || mongoose.model('User', UserSchema);
 export const FixedAsset = mongoose.models.FixedAsset || mongoose.model('FixedAsset', FixedAssetSchema);
 export const VatDeclaration = mongoose.models.VatDeclaration || mongoose.model('VatDeclaration', VatDeclarationSchema);
 export const StockInventory = mongoose.models.StockInventory || mongoose.model('StockInventory', StockInventorySchema);
+export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
+export const AccountBalance = mongoose.models.AccountBalance || mongoose.model('AccountBalance', AccountBalanceSchema);
 export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema);

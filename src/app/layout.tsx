@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Abebe Tigistu - Accounting System",
+  title: "Hisabe financing",
   description: "Accounting System for Fixed Assets, VAT Declaration, and Stock Inventory",
 };
 

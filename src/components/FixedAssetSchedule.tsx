@@ -84,37 +84,35 @@ const FixedAssetSchedule = () => {
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
-  if (loading) return <div className="animate-slide-up" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading schedule...</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#7A7A7A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Loading schedule…</div>;
 
   return (
     <div className="animate-slide-up">
       <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          <span>📋</span> Schedule
-        </div>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Fixed Assets Schedule</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Abebe Tigistu - Period ending Sene 30, 2017 E.C.</p>
+        <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#CB6843', marginBottom: '0.5rem' }}>📋 Schedule</div>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Fixed Assets Schedule</h1>
+        <p style={{ color: '#7A7A7A', fontSize: '0.9375rem' }}>Period ending Sene 30, 2017 E.C.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <div className="card" style={{ background: 'var(--accent-soft)', border: 'none' }}>
-          <div style={{ fontSize: '0.875rem', color: 'var(--accent-primary)', fontWeight: 600, marginBottom: '0.5rem' }}>Total Cost</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{formatCurrency(totals.costEnding)}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <div style={{ background: 'rgba(42,74,62,0.08)', borderRadius: 14, padding: '1.5rem', borderLeft: '4px solid #2A4A3E' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#2A4A3E', marginBottom: '0.5rem' }}>Total Cost</div>
+          <div style={{ fontSize: '1.625rem', fontWeight: 800, color: '#1A1A1A' }}>{formatCurrency(totals.costEnding)}</div>
         </div>
-        <div className="card" style={{ background: '#ecfdf5', border: 'none' }}>
-          <div style={{ fontSize: '0.875rem', color: '#059669', fontWeight: 600, marginBottom: '0.5rem' }}>Total Depreciation</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{formatCurrency(totals.depEnding)}</div>
+        <div style={{ background: 'rgba(203,104,67,0.08)', borderRadius: 14, padding: '1.5rem', borderLeft: '4px solid #CB6843' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#CB6843', marginBottom: '0.5rem' }}>Total Depreciation</div>
+          <div style={{ fontSize: '1.625rem', fontWeight: 800, color: '#1A1A1A' }}>{formatCurrency(totals.depEnding)}</div>
         </div>
-        <div className="card" style={{ background: '#fffbeb', border: 'none', gridColumn: 'span 2' }}>
-          <div style={{ fontSize: '0.875rem', color: '#d97706', fontWeight: 600, marginBottom: '0.5rem' }}>Net Book Value</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{formatCurrency(totals.nbvEnding)}</div>
+        <div style={{ background: '#2A4A3E', borderRadius: 14, padding: '1.5rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem' }}>Net Book Value</div>
+          <div style={{ fontSize: '1.625rem', fontWeight: 800, color: '#CB6843' }}>{formatCurrency(totals.nbvEnding)}</div>
         </div>
       </div>
 
       <div style={{ marginBottom: '3rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>1. Cost Analysis</h3>
-          <button className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>Export PDF</button>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1A1A1A' }}>1. Cost Analysis</h3>
+          <button className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Export PDF</button>
         </div>
         <div className="table-container">
           <table className="modern-table">
@@ -148,16 +146,16 @@ const FixedAssetSchedule = () => {
                       onChange={(e) => updateAsset(asset.id, 'addition', e.target.value)}
                     />
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--accent-primary)' }}>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#2A4A3E' }}>
                     {formatCurrency((asset.cost_beginning || 0) + (asset.addition || 0))}
                   </td>
                 </tr>
               ))}
-              <tr style={{ background: 'var(--bg-main)', borderTop: '2px solid var(--border-base)' }}>
-                <td style={{ fontWeight: 800 }}>TOTAL COST</td>
+              <tr style={{ background: '#F3F1EA', borderTop: '2px solid #E2DFD4' }}>
+                <td style={{ fontWeight: 800, color: '#1A1A1A' }}>TOTAL COST</td>
                 <td style={{ textAlign: 'right', fontWeight: 800 }}>{formatCurrency(totals.cost_beginning)}</td>
                 <td style={{ textAlign: 'right', fontWeight: 800 }}>{formatCurrency(totals.addition)}</td>
-                <td style={{ textAlign: 'right', fontWeight: 800, color: 'var(--accent-primary)' }}>{formatCurrency(totals.costEnding)}</td>
+                <td style={{ textAlign: 'right', fontWeight: 800, color: '#2A4A3E' }}>{formatCurrency(totals.costEnding)}</td>
               </tr>
             </tbody>
           </table>
@@ -165,7 +163,7 @@ const FixedAssetSchedule = () => {
       </div>
 
       <div style={{ marginBottom: '3rem' }}>
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.25rem' }}>2. Depreciation Schedule</h3>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '1.25rem' }}>2. Depreciation Schedule</h3>
         <div className="table-container">
           <table className="modern-table">
             <thead>
@@ -181,7 +179,7 @@ const FixedAssetSchedule = () => {
                 <tr key={asset.id}>
                   <td style={{ fontWeight: 600 }}>
                     {asset.name}
-                    <span className="badge badge-blue" style={{ marginLeft: '0.75rem' }}>{(asset.dep_rate || 0.2) * 100}%</span>
+                    <span style={{ marginLeft: '0.75rem', background: 'rgba(42,74,62,0.1)', color: '#2A4A3E', padding: '0.125rem 0.5rem', borderRadius: 999, fontSize: '0.7rem', fontWeight: 700 }}>{(asset.dep_rate || 0.2) * 100}%</span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <input
@@ -201,16 +199,16 @@ const FixedAssetSchedule = () => {
                       onChange={(e) => updateAsset(asset.id, 'dep_addition', e.target.value)}
                     />
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#10b981' }}>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#CB6843' }}>
                     {formatCurrency((asset.dep_beginning || 0) + (asset.dep_addition || 0))}
                   </td>
                 </tr>
               ))}
-              <tr style={{ background: 'var(--bg-main)', borderTop: '2px solid var(--border-base)' }}>
-                <td style={{ fontWeight: 800 }}>TOTAL DEPRECIATION</td>
+              <tr style={{ background: '#F3F1EA', borderTop: '2px solid #E2DFD4' }}>
+                <td style={{ fontWeight: 800, color: '#1A1A1A' }}>TOTAL DEPRECIATION</td>
                 <td style={{ textAlign: 'right', fontWeight: 800 }}>{formatCurrency(totals.dep_beginning)}</td>
                 <td style={{ textAlign: 'right', fontWeight: 800 }}>{formatCurrency(totals.dep_addition)}</td>
-                <td style={{ textAlign: 'right', fontWeight: 800, color: '#10b981' }}>{formatCurrency(totals.depEnding)}</td>
+                <td style={{ textAlign: 'right', fontWeight: 800, color: '#CB6843' }}>{formatCurrency(totals.depEnding)}</td>
               </tr>
             </tbody>
           </table>

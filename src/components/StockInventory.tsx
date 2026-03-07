@@ -90,25 +90,23 @@ const StockInventory = () => {
     <div className="animate-slide-up">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f59e0b', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-            <span>📦</span> Inventory
-          </div>
-          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Stock Management</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Manage products and track real-time stock levels.</p>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#CB6843', marginBottom: '0.5rem' }}>📦 Inventory</div>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Stock Management</h1>
+          <p style={{ color: '#7A7A7A', fontSize: '0.9375rem' }}>Manage products and track real-time stock levels.</p>
         </div>
-        <button className="btn btn-primary" onClick={addItem}>
-          <span>+</span> Add New Product
+        <button style={{ background: '#2A4A3E', color: 'white', padding: '0.75rem 1.5rem', borderRadius: 10, border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'inherit', fontSize: '0.9375rem', boxShadow: '0 4px 12px rgba(42,74,62,0.25)' }} onClick={addItem}>
+          <span>+</span> Add Product
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <div className="card" style={{ borderLeft: '4px solid #f59e0b' }}>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.5rem' }}>Total Items</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{items.length}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <div style={{ background: 'rgba(42,74,62,0.08)', borderRadius: 14, padding: '1.5rem', borderLeft: '4px solid #2A4A3E' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#2A4A3E', marginBottom: '0.5rem' }}>Total Items</div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#1A1A1A' }}>{items.length}</div>
         </div>
-        <div className="card" style={{ borderLeft: '4px solid var(--accent-primary)', gridColumn: 'span 2' }}>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.5rem' }}>Total Inventory Value</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>{format(totalCost)} ETB</div>
+        <div style={{ background: '#2A4A3E', borderRadius: 14, padding: '1.5rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem' }}>Total Inventory Value</div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#CB6843' }}>{format(totalCost)} <span style={{ fontSize: '1rem', fontWeight: 600 }}>ETB</span></div>
         </div>
       </div>
 
@@ -131,7 +129,7 @@ const StockInventory = () => {
 
               return (
                 <tr key={item.id}>
-                  <td style={{ color: 'var(--text-muted)', fontWeight: 600 }}>#{index + 1}</td>
+                  <td style={{ color: '#A8A8A8', fontWeight: 700, fontSize: '0.8125rem' }}>#{index + 1}</td>
                   <td>
                     <input
                       type="text"
@@ -166,17 +164,16 @@ const StockInventory = () => {
                       onChange={(e) => updateItem(item.id, 'unit_cost', e.target.value)}
                     />
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 800, color: 'var(--accent-primary)' }}>
+                  <td style={{ textAlign: 'right', fontWeight: 800, color: '#2A4A3E' }}>
                     {format(itemTotal)}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="btn"
-                      style={{ padding: '0.5rem', color: 'var(--danger)', background: 'transparent' }}
+                      style={{ padding: '0.375rem 0.75rem', color: '#D94F3D', background: 'rgba(217,79,61,0.08)', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit', fontWeight: 700 }}
                       title="Delete Product"
                     >
-                      🗑️
+                      ✕
                     </button>
                   </td>
                 </tr>

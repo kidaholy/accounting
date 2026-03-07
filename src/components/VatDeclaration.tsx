@@ -58,28 +58,26 @@ const VatDeclaration = () => {
   return (
     <div className="animate-slide-up">
       <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          <span>📊</span> Tax Compliance
-        </div>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>VAT Declaration</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Standard Rate: <span className="badge badge-blue">15% VAT</span></p>
+        <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#CB6843', marginBottom: '0.5rem' }}>📊 Tax Compliance</div>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>VAT Declaration</h1>
+        <p style={{ color: '#7A7A7A', fontSize: '0.9375rem' }}>Standard Rate: <span style={{ background: 'rgba(42,74,62,0.1)', color: '#2A4A3E', padding: '0.125rem 0.75rem', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700 }}>15% VAT</span></p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
-        <div className="card" style={{ borderTop: '4px solid var(--accent-primary)' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: 'var(--accent-primary)' }}>⬆️</span> Output VAT (Sales)
+        <div style={{ background: 'white', border: '1.5px solid #E2DFD4', borderRadius: 14, padding: '1.75rem', borderTop: '4px solid #2A4A3E' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1A1A1A' }}>
+            <span>⬆️</span> Output VAT (Sales)
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Taxable Sales / Supplies</label>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Taxable Sales / Supplies</label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.875rem' }}>ETB</span>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#A8A8A8', fontSize: '0.8125rem', fontWeight: 700 }}>ETB</span>
                 <input
                   name="taxable_sales"
                   type="number"
-                  style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '0.8125rem 1rem 0.8125rem 3.5rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: '#F3F1EA', outline: 'none', fontWeight: 700, fontFamily: 'inherit', fontSize: '0.9375rem' }}
                   value={data.taxable_sales || ''}
                   onChange={handleChange}
                 />
@@ -87,54 +85,44 @@ const VatDeclaration = () => {
             </div>
           </div>
 
-          <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Total Output VAT</span>
-            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{format(outputVat)}</span>
+          <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid #E2DFD4', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#7A7A7A' }}>Total Output VAT</span>
+            <span style={{ fontSize: '1.625rem', fontWeight: 800, color: '#2A4A3E' }}>{format(outputVat)}</span>
           </div>
         </div>
 
-        <div className="card" style={{ borderTop: '4px solid #10b981' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#10b981' }}>⬇️</span> Input VAT (Purchases)
+        <div style={{ background: 'white', border: '1.5px solid #E2DFD4', borderRadius: 14, padding: '1.75rem', borderTop: '4px solid #CB6843' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1A1A1A' }}>
+            <span>⬇️</span> Input VAT (Purchases)
           </h3>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Local Purchases (Total)</label>
-              <input
-                name="local_purchases"
-                type="number"
-                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
-                value={data.local_purchases || ''}
-                onChange={handleChange}
-              />
+              <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Local Purchases (Total)</label>
+              <input name="local_purchases" type="number"
+                style={{ width: '100%', padding: '0.8125rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: '#F3F1EA', outline: 'none', fontWeight: 700, fontFamily: 'inherit', fontSize: '0.9375rem' }}
+                value={data.local_purchases || ''} onChange={handleChange} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Capital Assets Purchase</label>
-              <input
-                name="capital_assets"
-                type="number"
-                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
-                value={data.capital_assets || ''}
-                onChange={handleChange}
-              />
+              <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Capital Assets Purchase</label>
+              <input name="capital_assets" type="number"
+                style={{ width: '100%', padding: '0.8125rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: '#F3F1EA', outline: 'none', fontWeight: 700, fontFamily: 'inherit', fontSize: '0.9375rem' }}
+                value={data.capital_assets || ''} onChange={handleChange} />
             </div>
           </div>
-
-          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Total Input VAT</span>
-            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{format(totalInputVat)}</span>
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E2DFD4', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#7A7A7A' }}>Total Input VAT</span>
+            <span style={{ fontSize: '1.625rem', fontWeight: 800, color: '#CB6843' }}>{format(totalInputVat)}</span>
           </div>
         </div>
       </div>
 
-      <div className="card" style={{ background: 'var(--sidebar-bg)', color: 'white', textAlign: 'center', padding: '3rem', border: 'none' }}>
-        <p style={{ color: 'var(--sidebar-text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem', marginBottom: '1rem' }}>Final Tax Liability</p>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>VAT Due to Authorities</h3>
-        <div style={{ fontSize: '4rem', fontWeight: 900, color: '#4ade80', letterSpacing: '-0.02em' }}>
+      <div style={{ background: '#2A4A3E', borderRadius: 16, color: 'white', textAlign: 'center', padding: '3rem', border: 'none', marginTop: '0.5rem' }}>
+        <p style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: '0.75rem', marginBottom: '1rem' }}>Final Tax Liability</p>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: '0.75rem' }}>VAT Due to Authorities</h3>
+        <div style={{ fontSize: '4rem', fontWeight: 900, color: '#CB6843', letterSpacing: '-0.03em', lineHeight: 1 }}>
           {format(vatDue)}
         </div>
-        <p style={{ color: 'var(--sidebar-text)', fontSize: '0.875rem', marginTop: '1rem' }}>Computation based on Ethiopian Tax Regulations (ETB)</p>
+        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.875rem', marginTop: '1rem' }}>Ethiopian Tax Regulations (ETB) — @15% Standard Rate</p>
       </div>
     </div>
   );
