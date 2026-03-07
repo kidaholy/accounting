@@ -28,26 +28,52 @@ export default function Dashboard({ user }: DashboardProps) {
     await signOut({ callbackUrl: '/login' });
   };
 
-  let menuItems: { id: string, label: string, icon: React.ReactNode }[] = [];
+  // Define Groups structure
+  const menuGroups: { title: string, items: { id: string, label: string, icon: React.ReactNode }[] }[] = [];
 
   if (user.role === 'super_admin') {
-    menuItems = [
-      { id: 'admin', label: 'Administration', icon: <Shield size={18} strokeWidth={2.5} /> }
-    ];
+    menuGroups.push({
+      title: 'Administration',
+      items: [{ id: 'admin', label: 'System Admin', icon: <Shield size={18} strokeWidth={2.5} /> }]
+    });
   } else {
-    menuItems = [
-      { id: 'reports', label: 'Audited Statements', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
-      { id: 'sales-entry', label: 'Sales Recording', icon: <DollarSign size={18} strokeWidth={2.5} /> },
-      { id: 'purchase-entry', label: 'Purchase Entries', icon: <ShoppingCart size={18} strokeWidth={2.5} /> },
-      { id: 'payroll-entry', label: 'Payroll / Salaries', icon: <Users size={18} strokeWidth={2.5} /> },
-      { id: 'utilities-entry', label: 'Utilities Expense', icon: <Zap size={18} strokeWidth={2.5} /> },
-      { id: 'expense-entry', label: 'General Expenses', icon: <Wallet size={18} strokeWidth={2.5} /> },
-      { id: 'setup', label: 'Sales Items', icon: <Tag size={18} strokeWidth={2.5} /> },
-      { id: 'assets', label: 'Fixed Assets', icon: <Briefcase size={18} strokeWidth={2.5} /> },
-      { id: 'inventory', label: 'Stock Inventory', icon: <Package size={18} strokeWidth={2.5} /> },
-    ];
+    // Financial Control Group
+    menuGroups.push({
+      title: 'Financial Control',
+      items: [
+        { id: 'reports', label: 'Audited Statements', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
+        { id: 'vat', label: 'VAT Returns', icon: <FileText size={18} strokeWidth={2.5} /> },
+      ]
+    });
+
+    // Transactions Group
+    menuGroups.push({
+      title: 'Transactions',
+      items: [
+        { id: 'sales-entry', label: 'Sales Recording', icon: <DollarSign size={18} strokeWidth={2.5} /> },
+        { id: 'purchase-entry', label: 'Purchase Entries', icon: <ShoppingCart size={18} strokeWidth={2.5} /> },
+        { id: 'payroll-entry', label: 'Payroll / Salaries', icon: <Users size={18} strokeWidth={2.5} /> },
+        { id: 'utilities-entry', label: 'Utilities Expense', icon: <Zap size={18} strokeWidth={2.5} /> },
+        { id: 'expense-entry', label: 'General Expenses', icon: <Wallet size={18} strokeWidth={2.5} /> },
+      ]
+    });
+
+    // Assets & Inventory Group
+    menuGroups.push({
+      title: 'Management',
+      items: [
+        { id: 'inventory', label: 'Stock Inventory', icon: <Package size={18} strokeWidth={2.5} /> },
+        { id: 'assets', label: 'Fixed Assets', icon: <Briefcase size={18} strokeWidth={2.5} /> },
+        { id: 'setup', label: 'Sales Items', icon: <Tag size={18} strokeWidth={2.5} /> },
+      ]
+    });
+
+    // Optional Tenant Admin Group
     if (user.role === 'tenant_admin') {
-      menuItems.push({ id: 'tenant-admin', label: 'Tenant Admin', icon: <Building size={18} strokeWidth={2.5} /> });
+      menuGroups.push({
+        title: 'System',
+        items: [{ id: 'tenant-admin', label: 'Admin Settings', icon: <Building size={18} strokeWidth={2.5} /> }]
+      });
     }
   }
 
@@ -81,19 +107,23 @@ export default function Dashboard({ user }: DashboardProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="sidebar-nav">
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A0A0A0', marginBottom: '0.5rem', padding: '0 1rem' }}>
-            Main Menu
-          </div>
-          {menuItems.map(item => (
-            <button
-              key={item.id}
-              className={`nav-item${activeTab === item.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: activeTab === item.id ? 1 : 0.6 }}>{item.icon}</div>
-              {item.label}
-            </button>
+        <nav className="sidebar-nav" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {menuGroups.map(group => (
+            <div key={group.title} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A0A0A0', marginBottom: '0.5rem', padding: '0 1rem', opacity: 0.8 }}>
+                {group.title}
+              </div>
+              {group.items.map(item => (
+                <button
+                  key={item.id}
+                  className={`nav-item${activeTab === item.id ? ' active' : ''}`}
+                  onClick={() => setActiveTab(item.id)}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: activeTab === item.id ? 1 : 0.6 }}>{item.icon}</div>
+                  {item.label}
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
 

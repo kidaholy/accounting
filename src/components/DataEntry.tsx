@@ -26,7 +26,9 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
         vatAmount: '',
         category: fixedCategory || '',
         description: '',
-        date: new Date().toISOString().split('T')[0] // Default to today
+        date: new Date().toISOString().split('T')[0], // Default to today
+        qty: 1,
+        unitPrice: 0
     });
 
     const fetchData = async () => {
@@ -150,8 +152,29 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newType = e.target.value as 'sale' | 'purchase' | 'expense';
         const firstCat = categories.find(c => c.type === newType);
-        setFormData({ ...formData, type: newType, category: firstCat ? firstCat.name : '' });
+        setFormData({
+            ...formData,
+            type: newType,
+            category: firstCat ? firstCat.name : '',
+            qty: 1,
+            unitPrice: 0,
+            amount: '',
+            vatAmount: ''
+        });
     };
+
+    // Auto-calculate amount when qty or unitPrice changes
+    useEffect(() => {
+        if (formData.qty && formData.unitPrice) {
+            const total = formData.qty * formData.unitPrice;
+            const vat = total * 0.15; // Assuming 15% VAT for automated entries
+            setFormData(prev => ({
+                ...prev,
+                amount: total.toFixed(2),
+                vatAmount: vat.toFixed(2)
+            }));
+        }
+    }, [formData.qty, formData.unitPrice]);
 
     return (
         <div className="card" style={{ maxWidth: 600, margin: '0 auto', padding: '2rem' }}>
@@ -224,33 +247,8 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                         {categories.filter(c => c.type === formData.type).map(cat => (
                             <option key={cat._id} value={cat.name}>{cat.name}</option>
                         ))}
-                        {/* Fallback legacy defaults if no dynamic categories exist yet */}
                         {categories.filter(c => c.type === formData.type).length === 0 && (
-                            <>
-                                {formData.type === 'sale' && (
-                                    <>
-                                        <option value="Food Sales">Food Sales</option>
-                                        <option value="Beverage Sales">Beverage Sales</option>
-                                        <option value="Other Service">Other Service Revenue</option>
-                                    </>
-                                )}
-                                {formData.type === 'purchase' && (
-                                    <>
-                                        <option value="Raw Materials">Raw Materials (Meat, Veg)</option>
-                                        <option value="Non-taxable Material">Non-taxable Material (Water, etc.)</option>
-                                        <option value="Inventory">Inventory (Bottled Drinks)</option>
-                                        <option value="Packaging">Packaging Supplies</option>
-                                    </>
-                                )}
-                                {formData.type === 'expense' && (
-                                    <>
-                                        <option value="Rent">Rent</option>
-                                        <option value="Utilities">Utilities (Water & Electricity)</option>
-                                        <option value="Payroll">Payroll / Salaries</option>
-                                        <option value="Marketing">Marketing</option>
-                                    </>
-                                )}
-                            </>
+                            <option disabled value="">No categories found. Click 'Add' to create one.</option>
                         )}
                     </select>
                 </div>
@@ -266,10 +264,20 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                                 // Check if it's an inventory item
                                 const invItem = inventoryItems.find(i => i.id === val || i.name === val);
                                 if (invItem) {
+                                    // Try to find matching product for category automation
+                                    const matchingProd = products.find(p => p.name === invItem.name);
+                                    let autoCat = formData.category;
+                                    if (matchingProd) {
+                                        const prodCat = categories.find(c => c._id === matchingProd.category);
+                                        if (prodCat) autoCat = prodCat.name;
+                                    }
+
                                     setFormData({
                                         ...formData,
                                         description: invItem.name,
-                                        amount: invItem.unit_cost ? invItem.unit_cost.toString() : formData.amount
+                                        unitPrice: invItem.unit_cost || 0,
+                                        qty: 1,
+                                        category: autoCat
                                     });
                                 } else {
                                     setFormData({ ...formData, description: val });
@@ -298,7 +306,32 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
 
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Amount (ETB)</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Quantity</label>
+                        <input
+                            type="number"
+                            required
+                            min="1"
+                            value={formData.qty}
+                            onChange={(e) => setFormData({ ...formData, qty: parseFloat(e.target.value) || 0 })}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', background: '#F9F8F6' }}
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Unit Price (ETB)</label>
+                        <input
+                            type="number"
+                            required
+                            min="0"
+                            value={formData.unitPrice}
+                            onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) || 0 })}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', background: '#F9F8F6' }}
+                        />
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Total Amount (ETB)</label>
                         <input
                             type="number"
                             required
@@ -306,8 +339,7 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                             step="0.01"
                             value={formData.amount}
                             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                            placeholder="e.g. 5000"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', background: '#F9F8F6', fontWeight: 700 }}
                         />
                     </div>
                     <div style={{ flex: 1 }}>
