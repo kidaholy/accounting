@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { Plus, Settings, Trash2, X } from 'lucide-react';
 
 interface DataEntryProps {
     fixedType?: 'sale' | 'purchase' | 'expense';
@@ -14,6 +15,11 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
     const [products, setProducts] = useState<any[]>([]);
     const [inventoryItems, setInventoryItems] = useState<any[]>([]);
 
+    // Category Management State
+    const [isManagingCats, setIsManagingCats] = useState(false);
+    const [isAddingCat, setIsAddingCat] = useState(false);
+    const [newCatName, setNewCatName] = useState('');
+
     const [formData, setFormData] = useState({
         type: fixedType || 'sale',
         amount: '',
@@ -23,33 +29,67 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
         date: new Date().toISOString().split('T')[0] // Default to today
     });
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const [catRes, prodRes, invRes] = await Promise.all([
-                    fetch('/api/setup/categories'),
-                    fetch('/api/setup/products'),
-                    fetch('/api/inventory')
-                ]);
-                const catJson = await catRes.json();
-                const prodJson = await prodRes.json();
-                const invJson = await invRes.json();
+    const fetchData = async () => {
+        try {
+            const [catRes, prodRes, invRes] = await Promise.all([
+                fetch('/api/setup/categories'),
+                fetch('/api/setup/products'),
+                fetch('/api/inventory')
+            ]);
+            const catJson = await catRes.json();
+            const prodJson = await prodRes.json();
+            const invJson = await invRes.json();
 
-                if (catJson.success) setCategories(catJson.data);
-                if (prodJson.success) setProducts(prodJson.data);
-                if (Array.isArray(invJson)) setInventoryItems(invJson);
+            if (catJson.success) setCategories(catJson.data);
+            if (prodJson.success) setProducts(prodJson.data);
+            if (Array.isArray(invJson)) setInventoryItems(invJson);
 
-                // Set initial category if available
-                if (catJson.success && catJson.data.length > 0) {
-                    const firstSafe = catJson.data.find((c: any) => c.type === 'sale');
-                    if (firstSafe) setFormData(prev => ({ ...prev, category: firstSafe.name }));
+            // Set initial category if available and not fixed
+            if (!fixedCategory && catJson.success && catJson.data.length > 0) {
+                const filtered = catJson.data.filter((c: any) => c.type === (fixedType || formData.type));
+                if (filtered.length > 0 && !formData.category) {
+                    setFormData(prev => ({ ...prev, category: filtered[0].name }));
                 }
-            } catch (err) {
-                console.error('Failed to fetch categories/products/inventory:', err);
             }
+        } catch (err) {
+            console.error('Failed to fetch categories/products/inventory:', err);
         }
+    };
+
+    useEffect(() => {
         fetchData();
-    }, []);
+    }, [fixedType, fixedCategory]);
+
+    const handleAddCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newCatName) return;
+        try {
+            const res = await fetch('/api/setup/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newCatName, type: fixedType || formData.type })
+            });
+            if (res.ok) {
+                setNewCatName('');
+                setIsAddingCat(false);
+                await fetchData();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDeleteCategory = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this category?')) return;
+        try {
+            const res = await fetch(`/api/setup/categories?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                await fetchData();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const getAccountCode = (categoryName: string): number => {
         const cat = categories.find(c => c.name === categoryName);
@@ -155,7 +195,25 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                 </div>
 
                 <div>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Category</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D' }}>Category</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingCat(true)}
+                                style={{ fontSize: '0.75rem', color: '#2A4A3E', background: 'rgba(42,74,62,0.1)', border: 'none', padding: '0.2rem 0.5rem', borderRadius: 4, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.2rem' }}
+                            >
+                                <Plus size={12} /> Add
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsManagingCats(true)}
+                                style={{ fontSize: '0.75rem', color: '#7A7A7A', background: '#F3F1EA', border: 'none', padding: '0.2rem 0.5rem', borderRadius: 4, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.2rem' }}
+                            >
+                                <Settings size={12} /> Manage
+                            </button>
+                        </div>
+                    </div>
                     <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -286,6 +344,52 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                     {loading ? 'Processing...' : 'Record Transaction'}
                 </button>
             </form>
+
+            {/* Add Category UI */}
+            {isAddingCat && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div className="animate-slide-up" style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 400, padding: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1rem' }}>Add New Category</h3>
+                        <form onSubmit={handleAddCategory} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <input
+                                placeholder="Category Name (e.g. Pharma, Cleaning)"
+                                value={newCatName}
+                                onChange={(e) => setNewCatName(e.target.value)}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none' }}
+                                required
+                                autoFocus
+                            />
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                <button type="button" onClick={() => setIsAddingCat(false)} className="btn-secondary" style={{ padding: '0.5rem 1rem' }}>Cancel</button>
+                                <button type="submit" className="btn" style={{ padding: '0.5rem 1rem' }}>Save Category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Manage Categories Modal */}
+            {isManagingCats && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div className="animate-slide-up" style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 500, padding: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>Manage Categories</h3>
+                            <button onClick={() => setIsManagingCats(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#7A7A7A' }}><X size={24} /></button>
+                        </div>
+                        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {categories.filter(c => c.type === (fixedType || formData.type)).map(cat => (
+                                <div key={cat._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: '#F9F8F6', borderRadius: 8, border: '1px solid #E2DFD4' }}>
+                                    <span style={{ fontWeight: 700 }}>{cat.name}</span>
+                                    <button onClick={() => handleDeleteCategory(cat._id)} style={{ color: '#D94F3D', background: 'transparent', border: 'none', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                            {categories.filter(c => c.type === (fixedType || formData.type)).length === 0 && (
+                                <p style={{ textAlign: 'center', color: '#7A7A7A', padding: '1rem' }}>No custom categories yet.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
