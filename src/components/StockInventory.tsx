@@ -48,9 +48,10 @@ const StockInventory = () => {
   };
 
   const addItem = async () => {
-    const tempId = `temp-${Date.now()}`;
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newItemTemp: InventoryItem = { id: tempId, name: '', unit: '', quantity: 0, unit_cost: 0, isNew: true };
-    setItems([...items, newItemTemp]);
+    // Use functional state update to prevent array overwrites during rapid double clicks
+    setItems(prev => [...prev, newItemTemp]);
 
     try {
       const res = await fetch('/api/inventory', {
