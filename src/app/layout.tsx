@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Hisabe financing",
   description: "Accounting System for Fixed Assets, VAT Declaration, and Stock Inventory",
+  icons: {
+    icon: "/images/hisabe logo.jpg",
+  },
 };
 
 export default function RootLayout({
