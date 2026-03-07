@@ -296,7 +296,14 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                                             }}>
                                                 {t.status.toUpperCase()}
                                             </div>
-                                            <button style={{ background: 'transparent', border: 'none', color: '#7A7A7A' }}><MoreVertical size={18} /></button>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button onClick={() => openEditTenant(t)} style={{ color: '#3B82F6', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}>
+                                                    <Edit2 size={16} />
+                                                </button>
+                                                <button onClick={() => openDeleteTenant(t)} style={{ color: '#EF4444', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}>
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -352,7 +359,14 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                                             {new Date(t.createdAt).toLocaleDateString()}
                                         </td>
                                         <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                                            <button style={{ color: '#7A7A7A', background: 'transparent', border: 'none' }}><MoreVertical size={18} /></button>
+                                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                                                <button onClick={() => openEditTenant(t)} style={{ color: '#3B82F6', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600 }}>
+                                                    <Edit2 size={16} /> Edit
+                                                </button>
+                                                <button onClick={() => openDeleteTenant(t)} style={{ color: '#EF4444', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600 }}>
+                                                    <Trash2 size={16} /> Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -399,7 +413,14 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                                            <button style={{ color: '#7A7A7A', background: 'transparent', border: 'none' }}><MoreVertical size={18} /></button>
+                                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                                                <button onClick={() => openEditUser(u)} style={{ color: '#3B82F6', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600 }}>
+                                                    <Edit2 size={16} /> Edit
+                                                </button>
+                                                <button onClick={() => openDeleteUser(u)} style={{ color: '#EF4444', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600 }}>
+                                                    <Trash2 size={16} /> Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
