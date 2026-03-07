@@ -37,11 +37,12 @@ const StockInventory = () => {
 
     try {
       if (itemToUpdate.isNew) return; // Wait until saved properly to update
-      await fetch(`/api/inventory/${id}`, {
+      const res = await fetch(`/api/inventory/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(itemToUpdate)
       });
+      if (!res.ok) throw new Error('Failed to update item via API');
     } catch (err) {
       console.error('Failed to update item:', err);
     }
@@ -59,8 +60,9 @@ const StockInventory = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: 'New Item', unit: 'pcs', quantity: 0, unit_cost: 0 })
       });
+      if (!res.ok) throw new Error('API failed to create item');
       const savedItem = await res.json();
-      setItems(prev => prev.map(item => item.id === tempId ? { ...savedItem, isNew: false } : item));
+      setItems(prev => prev.map(item => item.id === tempId ? { ...item, ...savedItem, isNew: false } : item));
     } catch (err) {
       console.error('Failed to add item:', err);
       setItems(prev => prev.filter(item => item.id !== tempId));
@@ -72,7 +74,8 @@ const StockInventory = () => {
     setItems(items.filter(item => item.id !== id));
 
     try {
-      await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete item via API');
     } catch (err) {
       console.error('Failed to delete item:', err);
       setItems(previousItems);
