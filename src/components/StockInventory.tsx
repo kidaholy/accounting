@@ -15,6 +15,16 @@ const StockInventory = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Modal State
+  const [isAdding, setIsAdding] = useState(false);
+  const [addingLoading, setAddingLoading] = useState(false);
+  const [newItemForm, setNewItemForm] = useState({
+    name: '',
+    unit: 'pcs',
+    quantity: 0,
+    unit_cost: 0
+  });
+
   useEffect(() => {
     fetch('/api/inventory')
       .then(res => res.json())
@@ -48,24 +58,45 @@ const StockInventory = () => {
     }
   };
 
-  const addItem = async () => {
+  const handleOpenAddModal = () => {
+    setNewItemForm({ name: '', unit: 'pcs', quantity: 0, unit_cost: 0 });
+    setIsAdding(true);
+  };
+
+  const submitNewItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemForm.name) return;
+
+    setAddingLoading(true);
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newItemTemp: InventoryItem = { id: tempId, name: '', unit: '', quantity: 0, unit_cost: 0, isNew: true };
+    const newItemTemp: InventoryItem = {
+      id: tempId,
+      name: newItemForm.name,
+      unit: newItemForm.unit,
+      quantity: typeof newItemForm.quantity === 'string' ? parseFloat(newItemForm.quantity) : newItemForm.quantity,
+      unit_cost: typeof newItemForm.unit_cost === 'string' ? parseFloat(newItemForm.unit_cost) : newItemForm.unit_cost,
+      isNew: true
+    };
+
     // Use functional state update to prevent array overwrites during rapid double clicks
     setItems(prev => [...prev, newItemTemp]);
+    setIsAdding(false); // Close modal immediately for optimistic feel
 
     try {
       const res = await fetch('/api/inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'New Item', unit: 'pcs', quantity: 0, unit_cost: 0 })
+        body: JSON.stringify(newItemForm)
       });
       if (!res.ok) throw new Error('API failed to create item');
       const savedItem = await res.json();
       setItems(prev => prev.map(item => item.id === tempId ? { ...item, ...savedItem, isNew: false } : item));
     } catch (err) {
       console.error('Failed to add item:', err);
+      // Revert optimistic update
       setItems(prev => prev.filter(item => item.id !== tempId));
+    } finally {
+      setAddingLoading(false);
     }
   };
 
@@ -98,7 +129,10 @@ const StockInventory = () => {
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Stock Management</h1>
           <p style={{ color: '#7A7A7A', fontSize: '0.9375rem' }}>Manage products and track real-time stock levels.</p>
         </div>
-        <button style={{ background: '#2A4A3E', color: 'white', padding: '0.75rem 1.5rem', borderRadius: 10, border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'inherit', fontSize: '0.9375rem', boxShadow: '0 4px 12px rgba(42,74,62,0.25)' }} onClick={addItem}>
+        <button
+          style={{ background: '#2A4A3E', color: 'white', padding: '0.75rem 1.5rem', borderRadius: 10, border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'inherit', fontSize: '0.9375rem', boxShadow: '0 4px 12px rgba(42,74,62,0.25)' }}
+          onClick={handleOpenAddModal}
+        >
           <span>+</span> Add Product
         </button>
       </div>
@@ -176,6 +210,7 @@ const StockInventory = () => {
                       onClick={() => removeItem(item.id)}
                       style={{ padding: '0.375rem 0.75rem', color: '#D94F3D', background: 'rgba(217,79,61,0.08)', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit', fontWeight: 700 }}
                       title="Delete Product"
+                      disabled={item.isNew}
                     >
                       ✕
                     </button>
@@ -183,6 +218,11 @@ const StockInventory = () => {
                 </tr>
               );
             })}
+            {items.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#7A7A7A' }}>No items in inventory. Click "Add Product" to begin.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -190,6 +230,96 @@ const StockInventory = () => {
       <div style={{ marginTop: '1.5rem', textAlign: 'right', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
         * All costs are inclusive of applicable taxes.
       </div>
+
+      {/* Add Product Modal */}
+      {isAdding && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div className="animate-slide-up" style={{
+            background: 'white', borderRadius: 16, width: '100%', maxWidth: 500,
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #E2DFD4', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1A1A1A' }}>Add New Product</h2>
+              <button onClick={() => setIsAdding(false)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#A8A8A8' }}>×</button>
+            </div>
+
+            <form onSubmit={submitNewItem} style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#3D3D3D' }}>Product Name</label>
+                  <input
+                    type="text"
+                    required
+                    style={{ padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', fontFamily: 'inherit', width: '100%' }}
+                    value={newItemForm.name}
+                    onChange={e => setNewItemForm({ ...newItemForm, name: e.target.value })}
+                    placeholder="e.g. Acme Widgets"
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#3D3D3D' }}>Unit of Measurement</label>
+                  <input
+                    type="text"
+                    style={{ padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', fontFamily: 'inherit', width: '100%' }}
+                    value={newItemForm.unit}
+                    onChange={e => setNewItemForm({ ...newItemForm, unit: e.target.value })}
+                    placeholder="e.g. pcs, kg, box"
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#3D3D3D' }}>Initial Quantity</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      style={{ padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', fontFamily: 'inherit', width: '100%' }}
+                      value={newItemForm.quantity || ''}
+                      onChange={e => setNewItemForm({ ...newItemForm, quantity: parseFloat(e.target.value) || 0 })}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#3D3D3D' }}>Unit Cost (ETB)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      style={{ padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', fontFamily: 'inherit', width: '100%' }}
+                      value={newItemForm.unit_cost || ''}
+                      onChange={e => setNewItemForm({ ...newItemForm, unit_cost: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAdding(false)}
+                  style={{ padding: '0.75rem 1.5rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: 'transparent', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingLoading}
+                  style={{ padding: '0.75rem 1.5rem', borderRadius: 8, border: 'none', background: '#2A4A3E', color: 'white', fontWeight: 700, cursor: addingLoading ? 'not-allowed' : 'pointer', opacity: addingLoading ? 0.7 : 1 }}
+                >
+                  {addingLoading ? 'Adding...' : 'Save Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
