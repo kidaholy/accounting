@@ -31,7 +31,7 @@ const ProcessLine = () => (
 );
 
 // ─── Feature Card ─────────────────────────────────────────────────────────────
-function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div style={{
       background: 'white',
@@ -58,7 +58,7 @@ function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc:
 }
 
 // ─── Step Card ────────────────────────────────────────────────────────────────
-function StepCard({ step, icon, title, desc }: { step: number; icon: string; title: string; desc: string }) {
+function StepCard({ step, icon, title, desc }: { step: number; icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div style={{ textAlign: 'center', maxWidth: 240 }}>
       <div style={{
