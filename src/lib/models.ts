@@ -81,6 +81,7 @@ const StockInventorySchema = new mongoose.Schema({
 const TransactionSchema = new mongoose.Schema({
   tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   type: { type: String, enum: ['sale', 'purchase', 'expense'], required: true },
+  accountCode: { type: Number, required: true }, // e.g. 10100 for Cash, 40100 for Revenue
   date: { type: Date, default: Date.now },
   amount: { type: Number, required: true }, // Amount excluding VAT
   vatAmount: { type: Number, default: 0 },
@@ -92,6 +93,7 @@ const TransactionSchema = new mongoose.Schema({
 const AccountBalanceSchema = new mongoose.Schema({
   tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   accountType: { type: String, enum: ['asset', 'liability', 'equity'], required: true },
+  accountCode: { type: Number, required: true }, // e.g. 10100, 30100
   name: { type: String, required: true }, // e.g., 'Cash at Bank', 'Accounts Receivable'
   balance: { type: Number, default: 0 },
   lastUpdated: { type: Date, default: Date.now }

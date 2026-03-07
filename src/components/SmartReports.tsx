@@ -5,14 +5,19 @@ import { useState, useEffect } from 'react';
 export default function SmartReports() {
     const [loading, setLoading] = useState(true);
     const [reportData, setReportData] = useState<any>(null);
+    const [reconciliationError, setReconciliationError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchReports() {
             try {
                 const res = await fetch('/api/reports/financials');
                 const json = await res.json();
-                if (json.success) {
+                if (res.status === 400 && json.error?.includes('Reconciliation Error')) {
+                    setReconciliationError(json.error);
+                } else if (json.success) {
                     setReportData(json.data);
+                } else {
+                    console.error('API Error:', json.error);
                 }
             } catch (error) {
                 console.error('Failed to fetch reports:', error);
@@ -24,6 +29,21 @@ export default function SmartReports() {
     }, []);
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading smart reports...</div>;
+
+    if (reconciliationError) {
+        return (
+            <div className="animate-slide-up" style={{ padding: '3rem 2rem', maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚖️</div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#EF4444', marginBottom: '1rem' }}>Accounting Imbalance Detected</h2>
+                <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '1.5rem', borderRadius: 12, border: '1px solid #FCA5A5', fontSize: '0.9375rem', lineHeight: 1.6, textAlign: 'left' }}>
+                    <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>System Halt: {reconciliationError}</p>
+                    <p>According to Ethiopian accounting standards, the fundamental accounting equation (Assets = Liabilities + Equity + Net Income) must strictly balance before generating financial reports and VAT declarations.</p>
+                    <p style={{ marginTop: '0.75rem', fontWeight: 600 }}>Please review your journal entries and ensure double-entry accounting is maintained.</p>
+                </div>
+            </div>
+        );
+    }
+
     if (!reportData) return <div style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error loading data.</div>;
 
     const formatCurrency = (val: number) => `ETB ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -63,8 +83,16 @@ export default function SmartReports() {
                         <span style={{ color: '#3D3D3D' }}>Revenue</span>
                         <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.revenue)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#7A7A7A' }}>
-                        <span>Less: Cost of Sales</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#7A7A7A' }}>
+                        <span>Add: Purchases</span>
+                        <span>{formatCurrency(reportData.incomeStatement.purchases)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#7A7A7A' }}>
+                        <span>Less: Ending Inventory</span>
+                        <span>({formatCurrency(reportData.incomeStatement.endingInventoryValue)})</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#2A4A3E', fontWeight: 600, fontSize: '0.875rem', borderTop: '1px dashed #E2DFD4', paddingTop: '0.5rem' }}>
+                        <span>Cost of Sales</span>
                         <span>({formatCurrency(reportData.incomeStatement.costOfSales)})</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontWeight: 700, background: '#F3F1EA', padding: '0.5rem', borderRadius: 8 }}>

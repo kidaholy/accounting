@@ -47,6 +47,12 @@ export async function GET(request: Request) {
 
     } catch (error: any) {
         console.error('Error generating financial reports:', error);
+
+        // Handle strict Ethiopian accounting validation errors gracefully
+        if (error.message && error.message.includes('Reconciliation Error')) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+        }
+
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
