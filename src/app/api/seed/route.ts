@@ -72,10 +72,11 @@ export async function POST() {
         plan: demoTenant.subscriptionPlan,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Seed error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to seed data' },
+      { error: 'Failed to seed data', details: errorMessage },
       { status: 500 }
     );
   }
