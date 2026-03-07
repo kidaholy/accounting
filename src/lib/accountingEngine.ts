@@ -38,6 +38,7 @@ export interface IncomeStatement {
     revenue: number;
     purchases: number;
     openingInventory: number;
+    goodsAvailableForSale: number;
     endingInventoryValue: number;
     costOfSales: number;
     grossProfit: number;
@@ -104,12 +105,16 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
         }
     });
 
-    // Assume 0 opening inventory for MVP, could be dynamic depending on dates later
-    const openingInventory = 0;
+    // Fetch Opening Inventory from AccountBalance ledger 10102
+    // If no balance exists, it defaults to 0
+    const opBal = await AccountBalance.findOne({ tenant: tenantId, accountCode: 10102 });
+    const openingInventory = opBal ? opBal.balance : 0;
+
     const endingInventoryValue = await calculateEndingInventory(tenantId);
 
-    // COGS = OpeningStock + Purchases - EndingInventory Value
-    const costOfSales = (openingInventory + purchases) - endingInventoryValue;
+    // COGS Breakdown: (Opening + Purchases) - Ending
+    const goodsAvailableForSale = openingInventory + purchases;
+    const costOfSales = goodsAvailableForSale - endingInventoryValue;
     const grossProfit = revenue - costOfSales;
     const netIncome = grossProfit - operatingExpenses;
 
@@ -117,6 +122,7 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
         revenue,
         purchases,
         openingInventory,
+        goodsAvailableForSale,
         endingInventoryValue,
         costOfSales,
         grossProfit,

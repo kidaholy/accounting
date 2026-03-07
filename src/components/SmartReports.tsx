@@ -75,37 +75,57 @@ export default function SmartReports() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                 {/* Income Statement */}
-                <div className="card">
-                    <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', color: '#2A4A3E', borderBottom: '1px solid #E2DFD4', paddingBottom: '0.5rem' }}>
-                        Income Statement
+                <div className="card" style={{ transition: 'all 0.3s ease', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', color: '#2A4A3E', borderBottom: '2px solid #E2DFD4', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span>📊</span> Income Statement
                     </h2>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                        <span style={{ color: '#3D3D3D' }}>Revenue</span>
-                        <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.revenue)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#7A7A7A' }}>
-                        <span>Add: Purchases</span>
-                        <span>{formatCurrency(reportData.incomeStatement.purchases)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#7A7A7A' }}>
-                        <span>Less: Ending Inventory</span>
-                        <span>({formatCurrency(reportData.incomeStatement.endingInventoryValue)})</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#2A4A3E', fontWeight: 600, fontSize: '0.875rem', borderTop: '1px dashed #E2DFD4', paddingTop: '0.5rem' }}>
-                        <span>Cost of Sales</span>
-                        <span>({formatCurrency(reportData.incomeStatement.costOfSales)})</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontWeight: 700, background: '#F3F1EA', padding: '0.5rem', borderRadius: 8 }}>
-                        <span>Gross Profit</span>
-                        <span>{formatCurrency(reportData.incomeStatement.grossProfit)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#7A7A7A' }}>
-                        <span>Less: Operating Expenses</span>
-                        <span>({formatCurrency(reportData.incomeStatement.operatingExpenses)})</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.125rem', color: '#2A4A3E', borderTop: '2px solid #E2DFD4', paddingTop: '1rem' }}>
-                        <span>Net Income</span>
-                        <span>{formatCurrency(reportData.incomeStatement.netIncome)}</span>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
+                            <span style={{ color: '#555', fontWeight: 600 }}>Total Revenue</span>
+                            <span style={{ fontWeight: 800, fontSize: '1.125rem' }}>{formatCurrency(reportData.incomeStatement.revenue)}</span>
+                        </div>
+
+                        <div style={{ background: '#F9F8F6', borderRadius: 12, padding: '1rem', border: '1.5px solid #E2DFD4' }}>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#7A7A7A', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>Cost of Sales Calculation</div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                                <span style={{ color: '#7A7A7A' }}>Beginning Inventory (Opening)</span>
+                                <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.openingInventory)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                                <span style={{ color: '#7A7A7A' }}>Add: Total Purchases</span>
+                                <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.purchases)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', padding: '0.4rem 0.5rem', background: 'rgba(42, 74, 62, 0.05)', borderRadius: 6, fontWeight: 700, fontSize: '0.875rem', color: '#333' }}>
+                                <span>Goods Available for Sale</span>
+                                <span>{formatCurrency(reportData.incomeStatement.goodsAvailableForSale)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.875rem' }}>
+                                <span style={{ color: '#7A7A7A' }}>Less: Ending Stock Item</span>
+                                <span style={{ fontWeight: 600, color: '#CB6843' }}>({formatCurrency(reportData.incomeStatement.endingInventoryValue)})</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '2px solid #E2DFD4', fontWeight: 800, color: '#2A4A3E' }}>
+                                <span>Total Cost of Sales (CS)</span>
+                                <span>({formatCurrency(reportData.incomeStatement.costOfSales)})</span>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#2A4A3E', color: 'white', borderRadius: 10, fontWeight: 700 }}>
+                            <span>Gross Profit</span>
+                            <span>{formatCurrency(reportData.incomeStatement.grossProfit)}</span>
+                        </div>
+
+                        <div style={{ padding: '0.5rem 0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                <span style={{ color: '#555' }}>Operating Expenses</span>
+                                <span style={{ fontWeight: 600, color: '#EF4444' }}>({formatCurrency(reportData.incomeStatement.operatingExpenses)})</span>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1.25rem 1rem', background: 'rgba(203, 104, 67, 0.1)', color: '#CB6843', borderRadius: 12, border: '2px solid #CB6843', marginTop: '0.5rem' }}>
+                            <span style={{ fontWeight: 800, fontSize: '1.25rem' }}>Net Income</span>
+                            <span style={{ fontWeight: 800, fontSize: '1.25rem' }}>{formatCurrency(reportData.incomeStatement.netIncome)}</span>
+                        </div>
                     </div>
                 </div>
 

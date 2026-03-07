@@ -11,8 +11,25 @@ export default function DataEntry() {
         amount: '',
         vatAmount: '',
         category: 'Food Sales',
-        description: ''
+        description: '',
+        date: new Date().toISOString().split('T')[0] // Default to today
     });
+
+    const getAccountCode = (category: string): number => {
+        const mapping: Record<string, number> = {
+            'Food Sales': 40000,
+            'Beverage Sales': 40100,
+            'Other Service': 40200,
+            'Raw Materials': 50200,
+            'Inventory': 50200,
+            'Packaging': 50200,
+            'Rent': 50100,
+            'Utilities': 50101,
+            'Payroll': 50102,
+            'Marketing': 50103,
+        };
+        return mapping[category] || 50100; // Default to general operating expense if unknown
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,8 +45,9 @@ export default function DataEntry() {
                     amount: Number(formData.amount),
                     vatAmount: formData.vatAmount ? Number(formData.vatAmount) : 0,
                     category: formData.category,
+                    accountCode: getAccountCode(formData.category),
                     description: formData.description,
-                    date: new Date()
+                    date: new Date(formData.date)
                 })
             });
 
@@ -71,17 +89,29 @@ export default function DataEntry() {
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-                <div>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Transaction Type</label>
-                    <select
-                        value={formData.type}
-                        onChange={handleTypeChange}
-                        style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
-                    >
-                        <option value="sale">Sale / Revenue</option>
-                        <option value="purchase">Purchase (Inventory/Assets)</option>
-                        <option value="expense">Operating Expense</option>
-                    </select>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Date</label>
+                        <input
+                            type="date"
+                            required
+                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', background: '#F9F8F6' }}
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Transaction Type</label>
+                        <select
+                            value={formData.type}
+                            onChange={handleTypeChange}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
+                        >
+                            <option value="sale">Sale / Revenue</option>
+                            <option value="purchase">Purchase (Inventory/Assets)</option>
+                            <option value="expense">Operating Expense</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
