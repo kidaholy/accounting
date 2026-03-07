@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { Shield, TrendingUp, FileEdit, Briefcase, FileText, Package, Building } from 'lucide-react';
+import { Shield, TrendingUp, FileEdit, Briefcase, FileText, Package, Building, Tag, DollarSign, ShoppingCart, Wallet, Users, Zap } from 'lucide-react';
 import FixedAssetSchedule from './FixedAssetSchedule';
 import VatDeclaration from './VatDeclaration';
 import StockInventory from './StockInventory';
@@ -37,9 +37,12 @@ export default function Dashboard({ user }: DashboardProps) {
   } else {
     menuItems = [
       { id: 'reports', label: 'Audited Statements', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
-      { id: 'vat', label: 'VAT Compliance', icon: <FileText size={18} strokeWidth={2.5} /> },
-      { id: 'data-entry', label: 'General Ledger', icon: <FileEdit size={18} strokeWidth={2.5} /> },
-      { id: 'setup', label: 'Product Setup', icon: <Shield size={18} strokeWidth={2.5} /> },
+      { id: 'sales-entry', label: 'Sales Recording', icon: <DollarSign size={18} strokeWidth={2.5} /> },
+      { id: 'purchase-entry', label: 'Purchase Entries', icon: <ShoppingCart size={18} strokeWidth={2.5} /> },
+      { id: 'payroll-entry', label: 'Payroll / Salaries', icon: <Users size={18} strokeWidth={2.5} /> },
+      { id: 'utilities-entry', label: 'Utilities Expense', icon: <Zap size={18} strokeWidth={2.5} /> },
+      { id: 'expense-entry', label: 'General Expenses', icon: <Wallet size={18} strokeWidth={2.5} /> },
+      { id: 'setup', label: 'Sales Items', icon: <Tag size={18} strokeWidth={2.5} /> },
       { id: 'assets', label: 'Fixed Assets', icon: <Briefcase size={18} strokeWidth={2.5} /> },
       { id: 'inventory', label: 'Stock Inventory', icon: <Package size={18} strokeWidth={2.5} /> },
     ];
@@ -51,8 +54,12 @@ export default function Dashboard({ user }: DashboardProps) {
   const tabTitles: Record<string, string> = {
     reports: 'Audited Financial Statements',
     vat: 'VAT Returns & Compliance',
-    'data-entry': 'General Ledger Transactions',
-    setup: 'Product & Category Setup',
+    'sales-entry': 'Record Sales Revenue',
+    'purchase-entry': 'Record Business Purchases',
+    'payroll-entry': 'Payroll & Salary Disbursement',
+    'utilities-entry': 'Utilities & Service Fees',
+    'expense-entry': 'Record Operating Expenses',
+    setup: 'Product & Sales Setup',
     assets: 'Fixed Asset Schedule',
     inventory: 'Stock Inventory',
     admin: 'Administration',
@@ -151,7 +158,11 @@ export default function Dashboard({ user }: DashboardProps) {
         {/* Content Area */}
         <main className="content-area animate-slide-up">
           {activeTab === 'reports' && <SmartReports />}
-          {activeTab === 'data-entry' && <DataEntry />}
+          {activeTab === 'sales-entry' && <DataEntry fixedType="sale" />}
+          {activeTab === 'purchase-entry' && <DataEntry fixedType="purchase" />}
+          {activeTab === 'payroll-entry' && <DataEntry fixedType="expense" fixedCategory="Payroll" />}
+          {activeTab === 'utilities-entry' && <DataEntry fixedType="expense" fixedCategory="Utilities" />}
+          {activeTab === 'expense-entry' && <DataEntry fixedType="expense" />}
           {activeTab === 'assets' && <FixedAssetSchedule />}
           {activeTab === 'vat' && <VatDeclaration />}
           {activeTab === 'inventory' && <StockInventory />}

@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from 'react';
 
-export default function DataEntry() {
+interface DataEntryProps {
+    fixedType?: 'sale' | 'purchase' | 'expense';
+    fixedCategory?: string;
+}
+
+export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps = {}) {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
     const [categories, setCategories] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
+    const [inventoryItems, setInventoryItems] = useState<any[]>([]);
 
     const [formData, setFormData] = useState({
-        type: 'sale',
+        type: fixedType || 'sale',
         amount: '',
         vatAmount: '',
-        category: '',
+        category: fixedCategory || '',
         description: '',
         date: new Date().toISOString().split('T')[0] // Default to today
     });
@@ -20,15 +26,18 @@ export default function DataEntry() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const [catRes, prodRes] = await Promise.all([
+                const [catRes, prodRes, invRes] = await Promise.all([
                     fetch('/api/setup/categories'),
-                    fetch('/api/setup/products')
+                    fetch('/api/setup/products'),
+                    fetch('/api/inventory')
                 ]);
                 const catJson = await catRes.json();
                 const prodJson = await prodRes.json();
+                const invJson = await invRes.json();
 
                 if (catJson.success) setCategories(catJson.data);
                 if (prodJson.success) setProducts(prodJson.data);
+                if (Array.isArray(invJson)) setInventoryItems(invJson);
 
                 // Set initial category if available
                 if (catJson.success && catJson.data.length > 0) {
@@ -36,7 +45,7 @@ export default function DataEntry() {
                     if (firstSafe) setFormData(prev => ({ ...prev, category: firstSafe.name }));
                 }
             } catch (err) {
-                console.error('Failed to fetch categories/products:', err);
+                console.error('Failed to fetch categories/products/inventory:', err);
             }
         }
         fetchData();
@@ -99,7 +108,7 @@ export default function DataEntry() {
     };
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newType = e.target.value;
+        const newType = e.target.value as 'sale' | 'purchase' | 'expense';
         const firstCat = categories.find(c => c.type === newType);
         setFormData({ ...formData, type: newType, category: firstCat ? firstCat.name : '' });
     };
@@ -129,18 +138,20 @@ export default function DataEntry() {
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none', background: '#F9F8F6' }}
                         />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Transaction Type</label>
-                        <select
-                            value={formData.type}
-                            onChange={handleTypeChange}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
-                        >
-                            <option value="sale">Sale / Revenue</option>
-                            <option value="purchase">Purchase (Inventory/Assets)</option>
-                            <option value="expense">Operating Expense</option>
-                        </select>
-                    </div>
+                    {!fixedType && (
+                        <div style={{ flex: 1 }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Transaction Type</label>
+                            <select
+                                value={formData.type}
+                                onChange={handleTypeChange}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
+                            >
+                                <option value="sale">Sale / Revenue</option>
+                                <option value="purchase">Purchase (Inventory/Assets)</option>
+                                <option value="expense">Operating Expense</option>
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 <div>
@@ -186,17 +197,43 @@ export default function DataEntry() {
                     </select>
                 </div>
 
-                {products.filter(p => p.type === formData.type).length > 0 && (
+                {(products.filter(p => p.type === formData.type).length > 0 || (formData.type === 'sale' && inventoryItems.length > 0)) && (
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Specific Product (Optional)</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Select Item (Standard or Inventory)</label>
                         <select
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (!val) return;
+
+                                // Check if it's an inventory item
+                                const invItem = inventoryItems.find(i => i.id === val || i.name === val);
+                                if (invItem) {
+                                    setFormData({
+                                        ...formData,
+                                        description: invItem.name,
+                                        amount: invItem.unit_cost ? invItem.unit_cost.toString() : formData.amount
+                                    });
+                                } else {
+                                    setFormData({ ...formData, description: val });
+                                }
+                            }}
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
                         >
                             <option value="">Select Product...</option>
-                            {products.filter(p => p.type === formData.type).map(prod => (
-                                <option key={prod._id} value={prod.name}>{prod.name}</option>
-                            ))}
+                            {/* Standard Products */}
+                            <optgroup label="Standard Products">
+                                {products.filter(p => p.type === formData.type).map(prod => (
+                                    <option key={prod._id} value={prod.name}>{prod.name}</option>
+                                ))}
+                            </optgroup>
+                            {/* Inventory Items (for Sales) */}
+                            {formData.type === 'sale' && inventoryItems.length > 0 && (
+                                <optgroup label="Items from Stock Management">
+                                    {inventoryItems.map(item => (
+                                        <option key={item.id} value={item.id}>{item.name} ({item.quantity} {item.unit} available)</option>
+                                    ))}
+                                </optgroup>
+                            )}
                         </select>
                     </div>
                 )}
