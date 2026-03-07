@@ -16,7 +16,10 @@ import {
     UserCheck,
     UserX,
     Settings,
-    AlertCircle
+    AlertCircle,
+    Edit2,
+    Trash2,
+    X
 } from 'lucide-react';
 
 interface Stats {
@@ -34,6 +37,18 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Modal State
+    const [selectedTenant, setSelectedTenant] = useState<any>(null);
+    const [isEditTenantModalOpen, setIsEditTenantModalOpen] = useState(false);
+    const [isDeleteTenantModalOpen, setIsDeleteTenantModalOpen] = useState(false);
+
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+    const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
+
+    const [formData, setFormData] = useState<any>({});
+    const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -59,6 +74,115 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
             setError('Failed to fetch data');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // --- CRUD Handlers for Tenants ---
+    const openEditTenant = (tenant: any) => {
+        setSelectedTenant(tenant);
+        setFormData({
+            name: tenant.name,
+            email: tenant.email,
+            subscriptionPlan: tenant.subscriptionPlan || 'professional',
+            subscriptionStatus: tenant.subscriptionStatus || 'active'
+        });
+        setIsEditTenantModalOpen(true);
+    };
+
+    const openDeleteTenant = (tenant: any) => {
+        setSelectedTenant(tenant);
+        setIsDeleteTenantModalOpen(true);
+    };
+
+    const handleUpdateTenant = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/admin/tenants/${selectedTenant._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (!res.ok) throw new Error('Failed to update tenant');
+            setIsEditTenantModalOpen(false);
+            fetchData(); // Refresh list
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleDeleteTenant = async () => {
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/admin/tenants/${selectedTenant._id}`, {
+                method: 'DELETE',
+            });
+            if (!res.ok) throw new Error('Failed to delete tenant');
+            setIsDeleteTenantModalOpen(false);
+            fetchData(); // Refresh list
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    // --- CRUD Handlers for Users ---
+    const openEditUser = (user: any) => {
+        setSelectedUser(user);
+        setFormData({
+            name: user.name,
+            email: user.email,
+            role: user.role || 'tenant_user',
+            isActive: user.isActive ?? true,
+            password: '' // Only send if changed
+        });
+        setIsEditUserModalOpen(true);
+    };
+
+    const openDeleteUser = (user: any) => {
+        setSelectedUser(user);
+        setIsDeleteUserModalOpen(true);
+    };
+
+    const handleUpdateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProcessing(true);
+        try {
+            // Remove empty password field so backend doesn't try to hash it
+            const payload = { ...formData };
+            if (!payload.password) delete payload.password;
+
+            const res = await fetch(`/api/admin/users/${selectedUser._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error('Failed to update user');
+            setIsEditUserModalOpen(false);
+            fetchData(); // Refresh list
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/admin/users/${selectedUser._id}`, {
+                method: 'DELETE',
+            });
+            if (!res.ok) throw new Error('Failed to delete user');
+            setIsDeleteUserModalOpen(false);
+            fetchData(); // Refresh list
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProcessing(false);
         }
     };
 
@@ -302,6 +426,148 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                 {loading && <div style={{ textAlign: 'center', padding: '5rem' }}>Loading system data...</div>}
                 {error && <div style={{ textAlign: 'center', padding: '5rem', color: '#EF4444' }}>{error}</div>}
             </main>
+
+            {/* --- Modals --- */}
+
+            {/* Edit Tenant Modal */}
+            {isEditTenantModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: 20, width: '100%', maxWidth: 500, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Edit Tenant</h2>
+                            <button onClick={() => setIsEditTenantModalOpen(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#7A7A7A' }}><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleUpdateTenant} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Business Name</label>
+                                <input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4' }} />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Business Email</label>
+                                <input value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required type="email" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4' }} />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Plan</label>
+                                    <select value={formData.subscriptionPlan} onChange={e => setFormData({ ...formData, subscriptionPlan: e.target.value })} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: 'white' }}>
+                                        <option value="free">Free</option>
+                                        <option value="basic">Basic</option>
+                                        <option value="professional">Professional</option>
+                                        <option value="enterprise">Enterprise</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Status</label>
+                                    <select value={formData.subscriptionStatus} onChange={e => setFormData({ ...formData, subscriptionStatus: e.target.value })} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: 'white' }}>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <button type="button" onClick={() => setIsEditTenantModalOpen(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#F3F1EA', color: '#1A1A1A', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                                <button type="submit" disabled={processing} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#2A4A3E', color: 'white', border: 'none', fontWeight: 700, cursor: processing ? 'wait' : 'pointer' }}>
+                                    {processing ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Tenant Modal */}
+            {isDeleteTenantModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: 20, width: '100%', maxWidth: 400, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                        <div style={{ width: 64, height: 64, background: 'rgba(239,68,68,0.1)', color: '#EF4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                            <AlertCircle size={32} />
+                        </div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem', color: '#1A1A1A' }}>Delete Tenant?</h2>
+                        <p style={{ color: '#7A7A7A', lineHeight: 1.6, marginBottom: '2rem' }}>
+                            Are you sure you want to completely delete <strong>{selectedTenant?.name}</strong>? This action cannot be undone and will erase all their associated data.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button onClick={() => setIsDeleteTenantModalOpen(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#F3F1EA', color: '#1A1A1A', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                            <button onClick={handleDeleteTenant} disabled={processing} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#EF4444', color: 'white', border: 'none', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,0.2)' }}>
+                                {processing ? 'Deleting...' : 'Yes, Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit User Modal */}
+            {isEditUserModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: 20, width: '100%', maxWidth: 500, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Edit User</h2>
+                            <button onClick={() => setIsEditUserModalOpen(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#7A7A7A' }}><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleUpdateUser} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Name</label>
+                                    <input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4' }} />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Email</label>
+                                    <input value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required type="email" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4' }} />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>New Password (Optional)</label>
+                                <input placeholder="Leave blank to keep unchanged" type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4' }} />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Role</label>
+                                    <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: 'white' }}>
+                                        <option value="super_admin">Super Admin</option>
+                                        <option value="tenant_admin">Tenant Admin</option>
+                                        <option value="tenant_accountant">Tenant Accountant</option>
+                                        <option value="tenant_user">Tenant User</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7A7A7A', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Status</label>
+                                    <select value={formData.isActive ? 'true' : 'false'} onChange={e => setFormData({ ...formData, isActive: e.target.value === 'true' })} style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', background: 'white' }}>
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <button type="button" onClick={() => setIsEditUserModalOpen(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#F3F1EA', color: '#1A1A1A', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                                <button type="submit" disabled={processing} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#2A4A3E', color: 'white', border: 'none', fontWeight: 700, cursor: processing ? 'wait' : 'pointer' }}>
+                                    {processing ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete User Modal */}
+            {isDeleteUserModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: 20, width: '100%', maxWidth: 400, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                        <div style={{ width: 64, height: 64, background: 'rgba(239,68,68,0.1)', color: '#EF4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                            <AlertCircle size={32} />
+                        </div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem', color: '#1A1A1A' }}>Delete User?</h2>
+                        <p style={{ color: '#7A7A7A', lineHeight: 1.6, marginBottom: '2rem' }}>
+                            Are you sure you want to completely delete <strong>{selectedUser?.name}</strong>? This will permanently remove their access.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button onClick={() => setIsDeleteUserModalOpen(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#F3F1EA', color: '#1A1A1A', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                            <button onClick={handleDeleteUser} disabled={processing} style={{ flex: 1, padding: '0.875rem', borderRadius: 10, background: '#EF4444', color: 'white', border: 'none', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,0.2)' }}>
+                                {processing ? 'Deleting...' : 'Yes, Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
