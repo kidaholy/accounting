@@ -72,7 +72,7 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Navigation */}
         <nav className="sidebar-nav">
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.3)', marginBottom: '0.5rem', padding: '0 1rem' }}>
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A0A0A0', marginBottom: '0.5rem', padding: '0 1rem' }}>
             Main Menu
           </div>
           {menuItems.map(item => (
@@ -90,13 +90,13 @@ export default function Dashboard({ user }: DashboardProps) {
         {/* Footer */}
         <div className="sidebar-footer">
           {/* User info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.06)', borderRadius: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: '#F3F1EA', borderRadius: 10 }}>
             <div style={{ width: 36, height: 36, background: '#CB6843', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.875rem', flexShrink: 0 }}>
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.75rem', textTransform: 'capitalize' }}>{user?.role?.replace(/_/g, ' ')}</div>
+              <div style={{ color: '#1A1A1A', fontWeight: 700, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
+              <div style={{ color: '#7A7A7A', fontSize: '0.75rem', textTransform: 'capitalize' }}>{user?.role?.replace(/_/g, ' ')}</div>
             </div>
           </div>
           <button className="nav-item" onClick={handleSignOut} style={{ color: '#f87171' }}>

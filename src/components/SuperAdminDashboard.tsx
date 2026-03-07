@@ -198,10 +198,10 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
     return (
         <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#F3F1EA' }}>
             {/* Sidebar */}
-            <aside style={{ width: 280, background: '#2A4A3E', color: 'white', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <aside style={{ width: 280, background: 'white', color: '#1A1A1A', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', borderRight: '1.5px solid #E2DFD4' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '3rem' }}>
                     <img src="/images/hisabe logo.jpg" alt="Logo" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />
-                    <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em' }}>Hisabe Admin</span>
+                    <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: '#1A1A1A' }}>Hisabe Admin</span>
                 </div>
 
                 <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -212,8 +212,8 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.75rem',
                                 padding: '0.875rem 1.25rem', borderRadius: 12,
-                                background: activeTab === item.id ? '#CB6843' : 'transparent',
-                                color: 'white', border: 'none', cursor: 'pointer',
+                                background: activeTab === item.id ? 'rgba(42, 74, 62, 0.08)' : 'transparent',
+                                color: activeTab === item.id ? '#2A4A3E' : '#7A7A7A', border: 'none', cursor: 'pointer',
                                 fontWeight: 600, fontSize: '0.9375rem', transition: 'all 0.2s',
                                 textAlign: 'left'
                             }}
@@ -228,7 +228,7 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                     onClick={handleSignOut}
                     style={{
                         display: 'flex', alignItems: 'center', gap: '0.75rem',
-                        padding: '1rem 1.25rem', color: 'rgba(255,255,255,0.6)',
+                        padding: '1rem 1.25rem', color: '#EF4444',
                         background: 'transparent', border: 'none', cursor: 'pointer',
                         fontSize: '0.875rem', fontWeight: 600
                     }}
