@@ -84,14 +84,16 @@ export default function SmartReports() {
                         {/* Revenue Section */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#7A7A7A', letterSpacing: '0.05em' }}>Revenue Breakdown</div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.25rem 0' }}>
-                                <span style={{ color: '#555' }}>Sales of Food Items</span>
-                                <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.foodSales)}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.25rem 0' }}>
-                                <span style={{ color: '#555' }}>Sales of Beverage Items</span>
-                                <span style={{ fontWeight: 600 }}>{formatCurrency(reportData.incomeStatement.beverageSales)}</span>
-                            </div>
+                            {Object.entries(reportData.incomeStatement.revenueBreakdown || {}).length > 0 ? (
+                                Object.entries(reportData.incomeStatement.revenueBreakdown).map(([category, amount]: [string, any]) => (
+                                    <div key={category} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.25rem 0' }}>
+                                        <span style={{ color: '#555' }}>{category}</span>
+                                        <span style={{ fontWeight: 600 }}>{formatCurrency(amount)}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ fontSize: '0.875rem', color: '#999', fontStyle: 'italic', padding: '0.5rem 0' }}>No revenue recorded in this period</div>
+                            )}
                             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderTop: '1px solid #E2DFD4', marginTop: '0.5rem' }}>
                                 <span style={{ fontWeight: 800, color: '#2A4A3E' }}>Total Revenues (R)</span>
                                 <span style={{ fontWeight: 800, fontSize: '1.125rem' }}>{formatCurrency(reportData.incomeStatement.revenue)}</span>
@@ -314,6 +316,75 @@ export default function SmartReports() {
                             <span style={{ fontSize: '1rem' }}>⚠️</span> Ledger Imbalance Detected
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* Official VAT Return (image_0.png style) */}
+            <div className="card" style={{ border: '2px solid #333', padding: '2rem', background: 'white' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem', borderBottom: '2px solid #333', paddingBottom: '1rem' }}>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Value Added Tax (VAT) Return</h1>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', fontSize: '0.875rem', fontWeight: 700 }}>
+                        <span>ORGANIZATION: {reportData.vatDeclaration.organizationName}</span>
+                        <span>TIN: {reportData.vatDeclaration.tin}</span>
+                        <span>PERIOD: {reportData.vatDeclaration.period}</span>
+                    </div>
+                </div>
+
+                <div style={{ border: '1px solid #333' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', background: '#eee', fontWeight: 800, borderBottom: '1px solid #333', fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                        <div style={{ padding: '0.5rem', borderRight: '1px solid #333' }}>Description of Taxable Activity</div>
+                        <div style={{ padding: '0.5rem', borderRight: '1px solid #333', textAlign: 'center' }}>Base Amount (ETB)</div>
+                        <div style={{ padding: '0.5rem', textAlign: 'center' }}>VAT Amount (15%)</div>
+                    </div>
+
+                    {/* Box 5: Taxable Sales */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', borderBottom: '1px solid #333', fontSize: '0.875rem' }}>
+                        <div style={{ padding: '0.75rem', borderRight: '1px solid #333', display: 'flex', gap: '1rem' }}>
+                            <span style={{ fontWeight: 800 }}>[Box 5]</span>
+                            <span>Standard Taxable Sales & Services</span>
+                        </div>
+                        <div style={{ padding: '0.75rem', borderRight: '1px solid #333', textAlign: 'right', fontWeight: 600 }}>
+                            {reportData.vatDeclaration.box5TaxableSales.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </div>
+                        <div style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700 }}>
+                            {reportData.vatDeclaration.box5Vat.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </div>
+                    </div>
+
+                    {/* Box 10: Taxable Purchases */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', borderBottom: '2px solid #333', fontSize: '0.875rem' }}>
+                        <div style={{ padding: '0.75rem', borderRight: '1px solid #333', display: 'flex', gap: '1rem' }}>
+                            <span style={{ fontWeight: 800 }}>[Box 10]</span>
+                            <span>Standard Taxable Purchases (Local & Import)</span>
+                        </div>
+                        <div style={{ padding: '0.75rem', borderRight: '1px solid #333', textAlign: 'right', fontWeight: 600 }}>
+                            {reportData.vatDeclaration.box10TaxablePurchases.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </div>
+                        <div style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700, color: '#EF4444' }}>
+                            ({reportData.vatDeclaration.box10Vat.toLocaleString('en-US', { minimumFractionDigits: 2 })})
+                        </div>
+                    </div>
+
+                    {/* Summary Result */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', fontSize: '1rem', background: '#F9F8F6' }}>
+                        <div style={{ padding: '1rem', borderRight: '1px solid #333', display: 'flex', gap: '1rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                            <span>[Box 15]</span>
+                            <span>Net-credit (or Payable) to the Filer</span>
+                        </div>
+                        <div style={{ padding: '1rem', borderRight: '1px solid #333', background: '#ddd' }}></div>
+                        <div style={{ padding: '1rem', textAlign: 'right', fontWeight: 900, color: reportData.vatDeclaration.box15NetCredit >= 0 ? '#166534' : '#EF4444', textDecoration: 'underline double' }}>
+                            {formatCurrency(reportData.vatDeclaration.box15NetCredit)}
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>
+                    <div style={{ borderTop: '1px solid #333', paddingTop: '0.5rem', width: '200px', textAlign: 'center' }}>
+                        Accountant Name / Stamp
+                    </div>
+                    <div style={{ borderTop: '1px solid #333', paddingTop: '0.5rem', width: '200px', textAlign: 'center' }}>
+                        Tax Authority Received Date
+                    </div>
                 </div>
             </div>
 

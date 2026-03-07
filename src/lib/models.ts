@@ -77,6 +77,25 @@ const StockInventorySchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Product Category Schema
+const ProductCategorySchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+  name: { type: String, required: true },
+  type: { type: String, enum: ['sale', 'purchase', 'expense'], required: true },
+  accountCode: { type: Number },
+  createdAt: { type: Date, default: Date.now }
+});
+
+// Product Schema
+const ProductSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+  name: { type: String, required: true },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory', required: true },
+  unit: { type: String },
+  type: { type: String, enum: ['sale', 'purchase', 'expense'], required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
 // Transaction Schema (Core engine for Income Statement and VAT)
 const TransactionSchema = new mongoose.Schema({
   tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
@@ -117,6 +136,8 @@ export const User = mongoose.models.User || mongoose.model('User', UserSchema);
 export const FixedAsset = mongoose.models.FixedAsset || mongoose.model('FixedAsset', FixedAssetSchema);
 export const VatDeclaration = mongoose.models.VatDeclaration || mongoose.model('VatDeclaration', VatDeclarationSchema);
 export const StockInventory = mongoose.models.StockInventory || mongoose.model('StockInventory', StockInventorySchema);
+export const ProductCategory = mongoose.models.ProductCategory || mongoose.model('ProductCategory', ProductCategorySchema);
+export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
 export const AccountBalance = mongoose.models.AccountBalance || mongoose.model('AccountBalance', AccountBalanceSchema);
 export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema);

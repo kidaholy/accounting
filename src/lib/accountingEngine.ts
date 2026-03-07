@@ -31,6 +31,15 @@ export const COA = {
 export const VAT_RATE = 0.15; // Standard Ethiopian VAT
 
 export interface VatReport {
+    organizationName: string;
+    tin: string;
+    period: string;
+    box5TaxableSales: number;
+    box5Vat: number;
+    box10TaxablePurchases: number;
+    box10Vat: number;
+    box15NetCredit: number;
+    // Legacy fields for backward compatibility if needed
     baseSales: number;
     outputVat: number;
     basePurchases: number;
@@ -40,8 +49,7 @@ export interface VatReport {
 
 export interface IncomeStatement {
     revenue: number;
-    foodSales: number;
-    beverageSales: number;
+    revenueBreakdown: Record<string, number>;
     purchases: number;
     purchasesTaxable: number;
     purchasesNonTaxable: number;
@@ -116,8 +124,8 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
 
     const transactions = await Transaction.find(query);
 
-    let foodSales = 0;
-    let beverageSales = 0;
+    let totalRevenue = 0;
+    const revenueBreakdown: Record<string, number> = {};
     let purchasesTaxable = 0;
     let purchasesNonTaxable = 0;
     let operatingExpenses = 0;
@@ -129,15 +137,14 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
         'Other Operating': 0
     };
 
-    // Aggregate by 5-digit account code
+    // Aggregate by 5-digit account code and Category
     transactions.forEach(tx => {
         const code = tx.accountCode;
-        if (code === 40000) {
-            foodSales += tx.amount;
-        } else if (code === 40100 || code === 39006) {
-            beverageSales += tx.amount;
-        } else if (code >= 40000 && code < 50000) {
-            foodSales += tx.amount; // Default other 4xxxx to food sales for now
+        if (code >= 40000 && code < 50000) {
+            // Aggregated Revenue by category
+            const catName = tx.category || 'Other Sales';
+            revenueBreakdown[catName] = (revenueBreakdown[catName] || 0) + tx.amount;
+            totalRevenue += tx.amount;
         } else if (code === COA.EXP_PURCHASES) {
             purchasesTaxable += tx.amount;
         } else if (code === COA.EXP_PURCHASES_NON_TAXABLE) {
@@ -149,7 +156,8 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
             else if (code === 50005) expenseBreakdown['Supplies'] += tx.amount;
             else if (code === 50007) expenseBreakdown['Pension'] += tx.amount;
             else if (code !== COA.EXP_PURCHASES && code !== COA.EXP_PURCHASES_NON_TAXABLE) {
-                expenseBreakdown['Other Operating'] += tx.amount;
+                const expCat = tx.category || 'Other Operating';
+                expenseBreakdown[expCat] = (expenseBreakdown[expCat] || 0) + tx.amount;
             }
 
             if (code !== COA.EXP_PURCHASES && code !== COA.EXP_PURCHASES_NON_TAXABLE) {
@@ -158,7 +166,7 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
         }
     });
 
-    const revenue = foodSales + beverageSales;
+    const revenue = totalRevenue;
     const purchases = purchasesTaxable + purchasesNonTaxable;
 
     // Fetch Opening Inventory from AccountBalance ledger 10102
@@ -181,8 +189,7 @@ export async function generateIncomeStatement(tenantId: string, startDate?: Date
 
     return {
         revenue,
-        foodSales,
-        beverageSales,
+        revenueBreakdown,
         purchases,
         purchasesTaxable,
         purchasesNonTaxable,
@@ -320,12 +327,35 @@ export async function generateVatReport(tenantId: string, startDate?: Date, endD
     const outputVat = baseSales * VAT_RATE;
     const inputVat = basePurchases * VAT_RATE;
 
+    // Mapping to formal tax form boxes (image_0.png)
+    const box5TaxableSales = baseSales;
+    const box5Vat = outputVat;
+    const box10TaxablePurchases = basePurchases;
+    const box10Vat = inputVat;
+    const box15NetCredit = box5Vat - box10Vat;
+
+    // Metadata for the formal form header
+    const organizationName = "Ato Abebe Tigistu"; // In production, this would come from tenant settings
+    const tin = "0000000000"; // Placeholder TIN
+    const period = startDate && endDate
+        ? `${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`
+        : "Current Period";
+
     return {
+        organizationName,
+        tin,
+        period,
+        box5TaxableSales,
+        box5Vat,
+        box10TaxablePurchases,
+        box10Vat,
+        box15NetCredit,
+        // Legacy fields for backward compatibility
         baseSales,
         outputVat,
         basePurchases,
         inputVat,
-        netVatPayable: outputVat - inputVat
+        netVatPayable: box15NetCredit
     };
 }
 

@@ -9,6 +9,7 @@ import VatDeclaration from './VatDeclaration';
 import StockInventory from './StockInventory';
 import SmartReports from './SmartReports';
 import DataEntry from './DataEntry';
+import CategoryManagement from './CategoryManagement';
 
 interface User {
   name?: string | null;
@@ -35,10 +36,11 @@ export default function Dashboard({ user }: DashboardProps) {
     ];
   } else {
     menuItems = [
-      { id: 'reports', label: 'Smart Reports', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
-      { id: 'data-entry', label: 'Data Entry', icon: <FileEdit size={18} strokeWidth={2.5} /> },
+      { id: 'reports', label: 'Audited Statements', icon: <TrendingUp size={18} strokeWidth={2.5} /> },
+      { id: 'vat', label: 'VAT Compliance', icon: <FileText size={18} strokeWidth={2.5} /> },
+      { id: 'data-entry', label: 'General Ledger', icon: <FileEdit size={18} strokeWidth={2.5} /> },
+      { id: 'setup', label: 'Product Setup', icon: <Shield size={18} strokeWidth={2.5} /> },
       { id: 'assets', label: 'Fixed Assets', icon: <Briefcase size={18} strokeWidth={2.5} /> },
-      { id: 'vat', label: 'VAT Declaration', icon: <FileText size={18} strokeWidth={2.5} /> },
       { id: 'inventory', label: 'Stock Inventory', icon: <Package size={18} strokeWidth={2.5} /> },
     ];
     if (user.role === 'tenant_admin') {
@@ -47,10 +49,11 @@ export default function Dashboard({ user }: DashboardProps) {
   }
 
   const tabTitles: Record<string, string> = {
-    reports: 'Financial & Smart Reports',
-    'data-entry': 'Record Transactions',
+    reports: 'Audited Financial Statements',
+    vat: 'VAT Returns & Compliance',
+    'data-entry': 'General Ledger Transactions',
+    setup: 'Product & Category Setup',
     assets: 'Fixed Asset Schedule',
-    vat: 'VAT Declaration',
     inventory: 'Stock Inventory',
     admin: 'Administration',
     'tenant-admin': 'Tenant Administration',
@@ -152,6 +155,7 @@ export default function Dashboard({ user }: DashboardProps) {
           {activeTab === 'assets' && <FixedAssetSchedule />}
           {activeTab === 'vat' && <VatDeclaration />}
           {activeTab === 'inventory' && <StockInventory />}
+          {activeTab === 'setup' && <CategoryManagement />}
           {activeTab === 'admin' && user?.role === 'super_admin' && (
             <div className="card" style={{ padding: '4rem 3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
               <Shield size={64} color="#3B82F6" />

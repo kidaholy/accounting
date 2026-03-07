@@ -51,7 +51,7 @@ export default function VatDeclaration() {
     <div className="animate-slide-up">
       <div style={{ marginBottom: '2.5rem' }}>
         <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#CB6843', marginBottom: '0.5rem' }}>📊 Tax Compliance • 2017 E.C.</div>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>VAT Declaration Form</h1>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1A1A1A', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Value Added Tax (VAT) Return</h1>
         <p style={{ color: '#7A7A7A', fontSize: '0.9375rem' }}>Automated from General Ledger: <span style={{ background: 'rgba(42,74,62,0.1)', color: '#2A4A3E', padding: '0.125rem 0.75rem', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700 }}>15% VAT Standard</span></p>
       </div>
 

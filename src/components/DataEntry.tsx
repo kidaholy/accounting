@@ -1,21 +1,52 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function DataEntry() {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
+    const [categories, setCategories] = useState<any[]>([]);
+    const [products, setProducts] = useState<any[]>([]);
 
     const [formData, setFormData] = useState({
         type: 'sale',
         amount: '',
         vatAmount: '',
-        category: 'Food Sales',
+        category: '',
         description: '',
         date: new Date().toISOString().split('T')[0] // Default to today
     });
 
-    const getAccountCode = (category: string): number => {
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const [catRes, prodRes] = await Promise.all([
+                    fetch('/api/setup/categories'),
+                    fetch('/api/setup/products')
+                ]);
+                const catJson = await catRes.json();
+                const prodJson = await prodRes.json();
+
+                if (catJson.success) setCategories(catJson.data);
+                if (prodJson.success) setProducts(prodJson.data);
+
+                // Set initial category if available
+                if (catJson.success && catJson.data.length > 0) {
+                    const firstSafe = catJson.data.find((c: any) => c.type === 'sale');
+                    if (firstSafe) setFormData(prev => ({ ...prev, category: firstSafe.name }));
+                }
+            } catch (err) {
+                console.error('Failed to fetch categories/products:', err);
+            }
+        }
+        fetchData();
+    }, []);
+
+    const getAccountCode = (categoryName: string): number => {
+        const cat = categories.find(c => c.name === categoryName);
+        if (cat && cat.accountCode) return cat.accountCode;
+
+        // Fallback to existing logic for legacy/default mapping
         const mapping: Record<string, number> = {
             'Food Sales': 40000,
             'Beverage Sales': 40100,
@@ -29,7 +60,7 @@ export default function DataEntry() {
             'Payroll': 50102,
             'Marketing': 50103,
         };
-        return mapping[category] || 50100; // Default to general operating expense if unknown
+        return mapping[categoryName] || (formData.type === 'sale' ? 40000 : 50100);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -69,11 +100,8 @@ export default function DataEntry() {
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newType = e.target.value;
-        let defaultCat = 'Food Sales';
-        if (newType === 'purchase') defaultCat = 'Raw Materials';
-        if (newType === 'expense') defaultCat = 'Rent';
-
-        setFormData({ ...formData, type: newType, category: defaultCat });
+        const firstCat = categories.find(c => c.type === newType);
+        setFormData({ ...formData, type: newType, category: firstCat ? firstCat.name : '' });
     };
 
     return (
@@ -121,32 +149,57 @@ export default function DataEntry() {
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
+                        required
                     >
-                        {formData.type === 'sale' && (
+                        <option value="">Select Category</option>
+                        {categories.filter(c => c.type === formData.type).map(cat => (
+                            <option key={cat._id} value={cat.name}>{cat.name}</option>
+                        ))}
+                        {/* Fallback legacy defaults if no dynamic categories exist yet */}
+                        {categories.filter(c => c.type === formData.type).length === 0 && (
                             <>
-                                <option value="Food Sales">Food Sales</option>
-                                <option value="Beverage Sales">Beverage Sales</option>
-                                <option value="Other Service">Other Service Revenue</option>
-                            </>
-                        )}
-                        {formData.type === 'purchase' && (
-                            <>
-                                <option value="Raw Materials">Raw Materials (Meat, Veg)</option>
-                                <option value="Non-taxable Material">Non-taxable Material (Water, etc.)</option>
-                                <option value="Inventory">Inventory (Bottled Drinks)</option>
-                                <option value="Packaging">Packaging Supplies</option>
-                            </>
-                        )}
-                        {formData.type === 'expense' && (
-                            <>
-                                <option value="Rent">Rent</option>
-                                <option value="Utilities">Utilities (Water & Electricity)</option>
-                                <option value="Payroll">Payroll / Salaries</option>
-                                <option value="Marketing">Marketing</option>
+                                {formData.type === 'sale' && (
+                                    <>
+                                        <option value="Food Sales">Food Sales</option>
+                                        <option value="Beverage Sales">Beverage Sales</option>
+                                        <option value="Other Service">Other Service Revenue</option>
+                                    </>
+                                )}
+                                {formData.type === 'purchase' && (
+                                    <>
+                                        <option value="Raw Materials">Raw Materials (Meat, Veg)</option>
+                                        <option value="Non-taxable Material">Non-taxable Material (Water, etc.)</option>
+                                        <option value="Inventory">Inventory (Bottled Drinks)</option>
+                                        <option value="Packaging">Packaging Supplies</option>
+                                    </>
+                                )}
+                                {formData.type === 'expense' && (
+                                    <>
+                                        <option value="Rent">Rent</option>
+                                        <option value="Utilities">Utilities (Water & Electricity)</option>
+                                        <option value="Payroll">Payroll / Salaries</option>
+                                        <option value="Marketing">Marketing</option>
+                                    </>
+                                )}
                             </>
                         )}
                     </select>
                 </div>
+
+                {products.filter(p => p.type === formData.type).length > 0 && (
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>Specific Product (Optional)</label>
+                        <select
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', background: '#F9F8F6', outline: 'none' }}
+                        >
+                            <option value="">Select Product...</option>
+                            {products.filter(p => p.type === formData.type).map(prod => (
+                                <option key={prod._id} value={prod.name}>{prod.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <div style={{ flex: 1 }}>
