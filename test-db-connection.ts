@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
-import * as dotenv from 'dotenv';
-import path from 'path';
+import dns from 'node:dns';
 
-// Load .env.local
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// Set DNS servers to a reliable public one (Google & Cloudflare)
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
 
 const MONGO_URI = 'mongodb+srv://kidayos2014:holyunion@cluster0.py8wt9u.mongodb.net/accounting?retryWrites=true&w=majority&appName=Cluster0';
 
