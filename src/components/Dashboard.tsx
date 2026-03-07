@@ -42,26 +42,26 @@ export default function Dashboard({ user }: DashboardProps) {
       {/* Sidebar Navigation */}
       <aside className="sidebar glass-panel">
         <div>
-          <h2>{user.tenantName || 'Accounting System'}</h2>
+          <h2>{user?.tenantName || 'Accounting System'}</h2>
           <p className="subtitle">Cloud Accounting Platform</p>
         </div>
-        
+
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button 
+          <button
             className={`nav-item ${activeTab === 'assets' ? 'active' : ''}`}
             onClick={() => setActiveTab('assets')}
           >
             Fixed Assets Schedule
           </button>
-          
-          <button 
+
+          <button
             className={`nav-item ${activeTab === 'vat' ? 'active' : ''}`}
             onClick={() => setActiveTab('vat')}
           >
             VAT Declaration
           </button>
-          
-          <button 
+
+          <button
             className={`nav-item ${activeTab === 'inventory' ? 'active' : ''}`}
             onClick={() => setActiveTab('inventory')}
           >
@@ -69,7 +69,7 @@ export default function Dashboard({ user }: DashboardProps) {
           </button>
 
           {user.role === 'super_admin' && (
-            <button 
+            <button
               className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('admin')}
             >
@@ -78,7 +78,7 @@ export default function Dashboard({ user }: DashboardProps) {
           )}
 
           {user.role === 'tenant_admin' && (
-            <button 
+            <button
               className={`nav-item ${activeTab === 'tenant-admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('tenant-admin')}
             >
@@ -89,26 +89,26 @@ export default function Dashboard({ user }: DashboardProps) {
 
         <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--border-color)' }}>
           <div style={{ marginBottom: '1rem' }}>
-            <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{user.email}</div>
-            <span style={{ 
+            <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{user?.name}</div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{user?.email}</div>
+            <span style={{
               display: 'inline-block',
               marginTop: '0.5rem',
               padding: '0.25rem 0.75rem',
               borderRadius: '9999px',
               fontSize: '0.75rem',
               fontWeight: 500,
-              backgroundColor: getRoleBadgeColor(user.role),
+              backgroundColor: getRoleBadgeColor(user?.role),
               color: 'white'
             }}>
-              {user.role?.replace('_', ' ')}
+              {user?.role?.replace('_', ' ')}
             </span>
           </div>
-          <button 
+          <button
             onClick={handleSignOut}
             className="btn"
-            style={{ 
-              width: '100%', 
+            style={{
+              width: '100%',
               backgroundColor: 'transparent',
               border: '1px solid var(--border-color)',
               color: 'var(--text-secondary)'
@@ -125,13 +125,13 @@ export default function Dashboard({ user }: DashboardProps) {
           {activeTab === 'assets' && <FixedAssetSchedule />}
           {activeTab === 'vat' && <VatDeclaration />}
           {activeTab === 'inventory' && <StockInventory />}
-          {activeTab === 'admin' && user.role === 'super_admin' && (
+          {activeTab === 'admin' && user?.role === 'super_admin' && (
             <div>
               <h1>Super Admin Dashboard</h1>
               <p>Manage tenants, subscriptions, and system settings.</p>
             </div>
           )}
-          {activeTab === 'tenant-admin' && user.role === 'tenant_admin' && (
+          {activeTab === 'tenant-admin' && user?.role === 'tenant_admin' && (
             <div>
               <h1>Tenant Admin Dashboard</h1>
               <p>Manage users, view reports, and configure settings.</p>

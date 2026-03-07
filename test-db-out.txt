@@ -1,0 +1,37 @@
+Testing connection to MongoDB...
+URI: mongodb://****:****@ac-qa3hh5e-shard-00-00.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-01.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-02.py8wt9u.mongodb.net:27017/accounting?ssl=true&replicaSet=atlas-13j3a2-shard-0&authSource=admin&retryWrites=true&w=majority
+Connecting...
+Γ¥î Failed to connect to MongoDB:
+MongooseServerSelectionError: Server selection timed out after 5000 ms
+    at _handleConnectionErrors (C:\Users\hp\Desktop\Projects\Accounting\accounting2\node_modules\mongoose\lib\connection.js:1169:11)
+    at NativeConnection.openUri (C:\Users\hp\Desktop\Projects\Accounting\accounting2\node_modules\mongoose\lib\connection.js:1100:11)
+    at async testConnection (C:\Users\hp\Desktop\Projects\Accounting\accounting2\test-db-connection.ts:16:9) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(0) {},
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-13j3a2-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  cause: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(0) {},
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-13j3a2-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  }
+}
