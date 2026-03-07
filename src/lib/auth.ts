@@ -18,21 +18,21 @@ export const authOptions: NextAuthConfig = {
         }
 
         await connectDB();
-        
+
         const user = await User.findOne({ email: credentials.email as string }).populate('tenant');
-        
+
         if (!user) {
           return null;
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password as string, user.password as string);
-        
+
         if (!isPasswordValid) {
           return null;
         }
 
-        // Check if tenant subscription is active
-        if (user.tenant && user.tenant.subscriptionStatus !== 'active') {
+        // Check if tenant subscription is active (bypass for super_admin)
+        if (user.role !== 'super_admin' && user.tenant && user.tenant.subscriptionStatus !== 'active') {
           throw new Error('Subscription expired. Please contact your administrator.');
         }
 
