@@ -4,7 +4,8 @@ import {
     generateVatReport,
     generateIncomeStatement,
     generateBalanceSheet,
-    generateFinancialRatios
+    generateFinancialRatios,
+    generateTrialBalance
 } from '@/lib/accountingEngine';
 
 export async function GET(request: Request) {
@@ -27,11 +28,12 @@ export async function GET(request: Request) {
         const endDate = endDateParam ? new Date(endDateParam) : undefined;
 
         // Run engine calculations in parallel
-        const [vatReport, incomeStatement, balanceSheet, financialRatios] = await Promise.all([
+        const [vatReport, incomeStatement, balanceSheet, financialRatios, trialBalance] = await Promise.all([
             generateVatReport(tenantId, startDate, endDate),
             generateIncomeStatement(tenantId, startDate, endDate),
             generateBalanceSheet(tenantId),
-            generateFinancialRatios(tenantId, startDate, endDate)
+            generateFinancialRatios(tenantId, startDate, endDate),
+            generateTrialBalance(tenantId)
         ]);
 
         // Return the "Final Accountant-Style Report" payload
@@ -41,7 +43,8 @@ export async function GET(request: Request) {
                 vatDeclaration: vatReport,
                 incomeStatement: incomeStatement,
                 balanceSheet: balanceSheet,
-                financialRatios: financialRatios
+                financialRatios: financialRatios,
+                trialBalance: trialBalance
             }
         });
 

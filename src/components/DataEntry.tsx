@@ -21,6 +21,7 @@ export default function DataEntry() {
             'Beverage Sales': 40100,
             'Other Service': 40200,
             'Raw Materials': 50200,
+            'Non-taxable Material': 50201,
             'Inventory': 50200,
             'Packaging': 50200,
             'Rent': 50100,
@@ -131,6 +132,7 @@ export default function DataEntry() {
                         {formData.type === 'purchase' && (
                             <>
                                 <option value="Raw Materials">Raw Materials (Meat, Veg)</option>
+                                <option value="Non-taxable Material">Non-taxable Material (Water, etc.)</option>
                                 <option value="Inventory">Inventory (Bottled Drinks)</option>
                                 <option value="Packaging">Packaging Supplies</option>
                             </>
