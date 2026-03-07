@@ -1,448 +1,370 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-interface LandingPageProps {
-    user?: {
-        name?: string | null;
-        email?: string | null;
-    };
+export default function LandingPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+      {/* Navigation */}
+      <nav style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        zIndex: 50,
+        background: 'rgba(15, 23, 42, 0.8)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--glass-border)'
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '1rem 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ 
+              width: '40px', 
+              height: '40px', 
+              background: 'linear-gradient(135deg, var(--accent-color), var(--accent-hover))',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '1.25rem'
+            }}>
+              A
+            </div>
+            <span style={{ fontSize: '1.25rem', fontWeight: '600' }}>AccountPro</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            <Link href="#features" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
+              Features
+            </Link>
+            <Link href="#pricing" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
+              Pricing
+            </Link>
+            <Link href="/login">
+              <button className="btn btn-primary">Get Started</button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section style={{ 
+        paddingTop: '120px', 
+        paddingBottom: '80px',
+        textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 2rem' }}>
+          <div style={{ 
+            display: 'inline-block',
+            padding: '0.5rem 1rem',
+            background: 'rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            borderRadius: '9999px',
+            fontSize: '0.875rem',
+            color: 'var(--accent-color)',
+            marginBottom: '2rem'
+          }}>
+            🚀 New: Multi-tenant SaaS Platform
+          </div>
+
+          <h1 style={{ 
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontWeight: '700',
+            lineHeight: '1.1',
+            marginBottom: '1.5rem',
+            background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Modern Accounting for<br />Modern Businesses
+          </h1>
+
+          <p style={{ 
+            fontSize: '1.25rem',
+            color: 'var(--text-secondary)',
+            maxWidth: '600px',
+            margin: '0 auto 2rem',
+            lineHeight: '1.6'
+          }}>
+            Streamline your financial operations with our cloud-based accounting solution. 
+            Fixed assets, VAT compliance, and inventory management—all in one place.
+          </p>
+
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '4rem' }}>
+            <Link href="/login">
+              <button className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>
+                Start Free Trial
+              </button>
+            </Link>
+            <button className="btn" style={{ 
+              padding: '0.875rem 2rem', 
+              fontSize: '1rem',
+              background: 'transparent',
+              border: '1px solid var(--border-color)'
+            }}>
+              View Demo
+            </button>
+          </div>
+
+          {/* Dashboard Preview */}
+          <div className="glass-panel" style={{ 
+            padding: '2rem',
+            maxWidth: '1000px',
+            margin: '0 auto',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '40px',
+              background: 'rgba(0,0,0,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 1rem',
+              gap: '0.5rem'
+            }}>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }}></div>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }}></div>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }}></div>
+            </div>
+            <div style={{ marginTop: '2rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+              <div style={{ 
+                background: 'rgba(59, 130, 246, 0.1)', 
+                padding: '1.5rem', 
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(59, 130, 246, 0.2)'
+              }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Total Assets</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--accent-color)' }}>ETB 1,271,176</div>
+              </div>
+              <div style={{ 
+                background: 'rgba(16, 185, 129, 0.1)', 
+                padding: '1.5rem', 
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(16, 185, 129, 0.2)'
+              }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>VAT Payable</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--success)' }}>ETB 7,123,456</div>
+              </div>
+              <div style={{ 
+                background: 'rgba(139, 92, 246, 0.1)', 
+                padding: '1.5rem', 
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(139, 92, 246, 0.2)'
+              }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Inventory Value</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#8b5cf6' }}>ETB 892,450</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" style={{ padding: '80px 2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Everything You Need</h2>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
+              Comprehensive accounting tools designed for Ethiopian businesses
+            </p>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: '2rem' 
+          }}>
+            <FeatureCard 
+              icon="📊"
+              title="Fixed Asset Management"
+              description="Track depreciation, additions, and net book value with automated calculations."
+            />
+            <FeatureCard 
+              icon="🧾"
+              title="VAT Declaration"
+              description="Simplify tax compliance with automatic VAT calculations and reporting."
+            />
+            <FeatureCard 
+              icon="📦"
+              title="Inventory Tracking"
+              description="Real-time stock management with valuation and cost tracking."
+            />
+            <FeatureCard 
+              icon="👥"
+              title="Multi-User Access"
+              description="Role-based permissions for your team with super admin, admin, and accountant roles."
+            />
+            <FeatureCard 
+              icon="☁️"
+              title="Cloud Based"
+              description="Access your data anywhere, anytime with secure cloud storage."
+            />
+            <FeatureCard 
+              icon="📱"
+              title="Responsive Design"
+              description="Works seamlessly on desktop, tablet, and mobile devices."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" style={{ padding: '80px 2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Simple Pricing</h2>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
+              Choose the plan that fits your business needs
+            </p>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: '2rem',
+            maxWidth: '1000px',
+            margin: '0 auto'
+          }}>
+            <PricingCard 
+              name="Free"
+              price="0"
+              description="Perfect for small businesses getting started"
+              features={['1 User', '10 Assets', '50 Inventory Items', 'Basic VAT']}
+            />
+            <PricingCard 
+              name="Basic"
+              price="29"
+              description="For growing businesses with more needs"
+              features={['3 Users', '100 Assets', '500 Inventory Items', 'Full VAT', 'Email Support']}
+              popular
+            />
+            <PricingCard 
+              name="Professional"
+              price="79"
+              description="For established businesses"
+              features={['10 Users', '1000 Assets', '5000 Inventory Items', 'Advanced Reports', 'Priority Support']}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section style={{ padding: '80px 2rem', textAlign: 'center' }}>
+        <div className="glass-panel" style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 2rem' }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready to Get Started?</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+            Join thousands of businesses using AccountPro for their accounting needs.
+          </p>
+          <Link href="/login">
+            <button className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.125rem' }}>
+              Start Your Free Trial
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ 
+        padding: '3rem 2rem', 
+        borderTop: '1px solid var(--border-color)',
+        textAlign: 'center',
+        color: 'var(--text-secondary)'
+      }}>
+        <p>© 2024 AccountPro. All rights reserved.</p>
+      </footer>
+    </div>
+  );
 }
 
-export default function LandingPage({ user }: LandingPageProps) {
-    const [scrolled, setScrolled] = useState(false);
+function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  return (
+    <div className="glass-panel" style={{ padding: '2rem' }}>
+      <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{icon}</div>
+      <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>{title}</h3>
+      <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{description}</p>
+    </div>
+  );
+}
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    return (
-        <div className="landing-container">
-            {/* Background Blobs */}
-            <div className="blob blob-1"></div>
-            <div className="blob blob-2"></div>
-            <div className="blob blob-3"></div>
-
-            {/* Navigation */}
-            <nav className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
-                <div className="nav-content">
-                    <div className="logo">
-                        <span className="logo-text">Accounting<span className="text-cyan">System</span></span>
-                    </div>
-
-                    <div className="nav-links">
-                        <Link href="#features">Features</Link>
-                        <Link href="#about">About Us</Link>
-                        <Link href="#pricing">Pricing</Link>
-                    </div>
-
-                    <div className="nav-actions">
-                        {user ? (
-                            <Link href="/dashboard" className="btn-pill btn-cyan">
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href="/login" className="nav-link">Login</Link>
-                                <Link href="/login" className="btn-pill btn-outline">
-                                    Get Started
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </nav>
-
-            {/* Hero Section */}
-            <section className="hero">
-                <div className="hero-content">
-                    <div className="badge animate-fade-in">
-                        ✨ #1 Modern Accounting Solution
-                    </div>
-
-                    <h1 className="hero-title animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                        Easiest way to <span className="highlight-box">manage</span> <br />
-                        your business <span className="text-cyan">finance</span>
-                    </h1>
-
-                    <p className="hero-subtitle animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                        Streamline your fixed assets, VAT declarations, and stock inventory with our powerful, automated platform. Built for modern businesses.
-                    </p>
-
-                    <div className="hero-btns animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                        <Link href={user ? "/dashboard" : "/login"} className="btn-pill btn-cyan btn-large">
-                            {user ? "Go to Dashboard" : "Start Free Trial"}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '8px' }}>
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
-                        </Link>
-                        <Link href="#features" className="btn-pill btn-glass btn-large">
-                            Learn More
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="hero-visual animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                    <div className="mockup-container">
-                        {/* Main Mockup Card */}
-                        <div className="mockup-card glass-panel main-card">
-                            <div className="card-header">
-                                <div className="dots"><span></span><span></span><span></span></div>
-                                <div className="title">Revenue Overview</div>
-                            </div>
-                            <div className="chart-placeholder">
-                                <div className="bar" style={{ height: '40%' }}></div>
-                                <div className="bar" style={{ height: '70%' }}></div>
-                                <div className="bar" style={{ height: '55%' }}></div>
-                                <div className="bar" style={{ height: '90%' }}></div>
-                                <div className="bar" style={{ height: '65%' }}></div>
-                            </div>
-                        </div>
-
-                        {/* Floating elements */}
-                        <div className="floating-card glass-panel float-1">
-                            <div className="icon">💰</div>
-                            <div>
-                                <div className="label">Total Balance</div>
-                                <div className="value">$45,231.89</div>
-                            </div>
-                        </div>
-
-                        <div className="floating-card glass-panel float-2">
-                            <div className="icon">✅</div>
-                            <div>
-                                <div className="label">VAT Status</div>
-                                <div className="value text-success">Compliant</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Partner bar */}
-            <div className="partners-section">
-                <div className="partners-bar animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                    <span className="partner">Trusted By</span>
-                    <div className="partner-logos">
-                        <span className="logo-placeholder">NextJS</span>
-                        <span className="logo-placeholder">Vercel</span>
-                        <span className="logo-placeholder">MongoDB</span>
-                        <span className="logo-placeholder">AuthJS</span>
-                    </div>
-                </div>
-            </div>
-
-            <style jsx>{`
-        .landing-container {
-          min-height: 100vh;
-          background-color: #0b0b14;
-          color: #ffffff;
-          overflow-x: hidden;
-          position: relative;
-        }
-
-        /* Blobs */
-        .blob {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          z-index: 0;
-          opacity: 0.15;
-        }
-        .blob-1 {
-          width: 400px;
-          height: 400px;
-          background: #48e5e5;
-          top: -100px;
-          right: -100px;
-        }
-        .blob-2 {
-          width: 500px;
-          height: 500px;
-          background: #ff9f43;
-          bottom: 10%;
-          left: -150px;
-        }
-        .blob-3 {
-          width: 300px;
-          height: 300px;
-          background: #9333ea;
-          top: 40%;
-          right: 15%;
-        }
-
-        .landing-nav {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 100;
-          padding: 1.5rem 0;
-          transition: all 0.3s ease;
-        }
-        .landing-nav.scrolled {
-          padding: 1rem 0;
-          background: rgba(11, 11, 20, 0.8);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0 2rem;
-        }
-
-        .logo-text {
-          font-size: 1.5rem;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-        }
-        .text-cyan { color: #48e5e5; }
-
-        .nav-links {
-          display: flex;
-          gap: 2.5rem;
-        }
-        .nav-links a {
-          color: #94a3b8;
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.2s;
-        }
-        .nav-links a:hover { color: #ffffff; }
-
-        .nav-actions {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-        }
-        .nav-link {
-          color: #ffffff;
-          text-decoration: none;
-          font-weight: 500;
-        }
-
-        .btn-pill {
-          padding: 0.75rem 1.5rem;
-          border-radius: 9999px;
-          font-weight: 600;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          transition: all 0.2s;
-          cursor: pointer;
-        }
-        .btn-large { padding: 1rem 2rem; font-size: 1.125rem; }
-        .btn-cyan { background: #48e5e5; color: #0b0b14; }
-        .btn-cyan:hover { background: #3ad1d1; transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(72, 229, 229, 0.5); }
-        .btn-outline { border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; }
-        .btn-outline:hover { background: rgba(255, 255, 255, 0.05); border-color: #ffffff; }
-        .btn-glass { 
-          background: rgba(255, 255, 255, 0.05); 
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #ffffff;
-        }
-        .btn-glass:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
-
-        .hero {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 10rem 2rem 5rem;
-          display: grid;
-          grid-template-columns: 1.2fr 1fr;
-          gap: 4rem;
-          align-items: center;
-          position: relative;
-          z-index: 1;
-        }
-
-        .badge {
-          display: inline-block;
-          padding: 0.5rem 1rem;
-          background: rgba(72, 229, 229, 0.1);
-          border: 1px solid rgba(72, 229, 229, 0.2);
-          color: #48e5e5;
-          border-radius: 9999px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          margin-bottom: 2rem;
-        }
-
-        .hero-title {
-          font-size: 4rem;
-          line-height: 1.1;
-          font-weight: 800;
-          margin-bottom: 1.5rem;
-          letter-spacing: -0.04em;
-        }
-
-        .highlight-box {
-          position: relative;
-          display: inline-block;
-          padding: 0 0.5rem;
-          z-index: 1;
-        }
-        .highlight-box::after {
-          content: '';
-          position: absolute;
-          bottom: 10%;
-          left: 0;
-          width: 100%;
-          height: 30%;
-          background: #ff9f43;
-          border-radius: 4px;
-          z-index: -1;
-          opacity: 0.8;
-        }
-
-        .hero-subtitle {
-          font-size: 1.25rem;
-          color: #94a3b8;
-          margin-bottom: 3rem;
-          max-width: 540px;
-          line-height: 1.6;
-        }
-
-        .hero-btns {
-          display: flex;
-          gap: 1.5rem;
-        }
-
-        .hero-visual {
-          position: relative;
-          height: 500px;
-        }
-
-        .mockup-container {
-          position: relative;
-          width: 100%;
-          height: 100%;
-        }
-
-        .mockup-card {
-          position: absolute;
-          background: rgba(30, 41, 59, 0.7);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 2rem;
-          padding: 2rem;
-        }
-
-        .main-card {
-          width: 320px;
-          height: 450px;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%) rotate(-5deg);
-          box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
-        }
-
-        .card-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-        .dots { display: flex; gap: 4px; }
-        .dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
-        .title { font-size: 0.875rem; font-weight: 500; color: #94a3b8; }
-
-        .chart-placeholder {
-          height: 200px;
-          display: flex;
-          align-items: flex-end;
-          gap: 12px;
-          padding-bottom: 2rem;
-        }
-        .bar {
-          flex: 1;
-          background: linear-gradient(to top, #48e5e5, #9333ea);
-          border-radius: 4px;
-          opacity: 0.8;
-        }
-
-        .floating-card {
-          position: absolute;
-          padding: 1rem 1.5rem;
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          z-index: 2;
-          box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-        }
-
-        .float-1 {
-          top: 10%;
-          right: 0%;
-          transform: rotate(5deg);
-        }
-        .float-2 {
-          bottom: 15%;
-          left: 0%;
-          transform: rotate(-10deg);
-        }
-
-        .icon { font-size: 1.5rem; }
-        .label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px; }
-        .value { font-size: 1.125rem; font-weight: 700; }
-        .text-success { color: #10b981; }
-
-        .partners-section {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-        .partners-bar {
-          background: #ffffff;
-          padding: 2rem 3rem;
-          border-radius: 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          color: #0b0b14;
-        }
-        .partner { font-weight: 700; font-size: 1.25rem; opacity: 0.8; }
-        .partner-logos {
-          display: flex;
-          gap: 3rem;
-          font-weight: 800;
-          font-size: 1.5rem;
-          opacity: 0.3;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          opacity: 0;
-          animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @media (max-width: 968px) {
-          .hero {
-            grid-template-columns: 1fr;
-            text-align: center;
-            padding-top: 8rem;
-          }
-          .hero-subtitle { margin: 0 auto 3rem; }
-          .hero-btns { justify-content: center; }
-          .hero-visual { display: none; }
-          .nav-links { display: none; }
-          .hero-title { font-size: 3rem; }
-        }
-      `}</style>
+function PricingCard({ 
+  name, 
+  price, 
+  description, 
+  features, 
+  popular 
+}: { 
+  name: string; 
+  price: string; 
+  description: string; 
+  features: string[];
+  popular?: boolean;
+}) {
+  return (
+    <div className="glass-panel" style={{ 
+      padding: '2rem',
+      position: 'relative',
+      border: popular ? '2px solid var(--accent-color)' : undefined
+    }}>
+      {popular && (
+        <div style={{
+          position: 'absolute',
+          top: '-12px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--accent-color)',
+          color: 'white',
+          padding: '0.25rem 1rem',
+          borderRadius: '9999px',
+          fontSize: '0.75rem',
+          fontWeight: '500'
+        }}>
+          Most Popular
         </div>
-    );
+      )}
+      <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{name}</h3>
+      <div style={{ marginBottom: '1rem' }}>
+        <span style={{ fontSize: '3rem', fontWeight: '700' }}>${price}</span>
+        <span style={{ color: 'var(--text-secondary)' }}>/month</span>
+      </div>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>{description}</p>
+      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0' }}>
+        {features.map((feature, i) => (
+          <li key={i} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem',
+            marginBottom: '0.75rem',
+            color: 'var(--text-secondary)'
+          }}>
+            <span style={{ color: 'var(--success)' }}>✓</span>
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <Link href="/login" style={{ display: 'block' }}>
+        <button className="btn" style={{ 
+          width: '100%',
+          background: popular ? 'var(--accent-color)' : 'transparent',
+          border: popular ? 'none' : '1px solid var(--border-color)'
+        }}>
+          Get Started
+        </button>
+      </Link>
+    </div>
+  );
 }

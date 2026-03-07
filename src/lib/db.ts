@@ -11,7 +11,7 @@ if (dns.setDefaultResultOrder) {
 }
 
 // Use direct connection string to avoid SRV lookup issues
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://kidayos2014:holyunion@ac-qa3hh5e-shard-00-00.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-01.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-02.py8wt9u.mongodb.net:27017/accounting?ssl=true&replicaSet=atlas-13j3a2-shard-0&authSource=admin&retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://kidayos2014:holyunion@ac-qa3hh5e-shard-00-00.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-01.py8wt9u.mongodb.net:27017,ac-qa3hh5e-shard-00-02.py8wt9u.mongodb.net:27017/accounting?ssl=true&replicaSet=atlas-7h9w33-shard-0&authSource=admin&retryWrites=true&w=majority';
 
 if (!MONGO_URI) {
   throw new Error('Please define the MONGO_URI environment variable');

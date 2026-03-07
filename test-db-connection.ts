@@ -30,6 +30,19 @@ async function testConnection() {
         const collections = await mongoose.connection.db?.listCollections().toArray();
         console.log(`Available collections: ${collections?.map((c: any) => c.name).join(', ') || 'None'}`);
 
+        // Check for users
+        // @ts-ignore
+        const userCount = await mongoose.connection.db?.collection('users').countDocuments();
+        console.log(`User count in 'users' collection: ${userCount}`);
+
+        if (userCount === 0) {
+            console.log('⚠️ No users found. You may need to run the seed API: http://localhost:3000/api/seed (POST request)');
+        } else {
+            // @ts-ignore
+            const users = await mongoose.connection.db?.collection('users').find({}, { projection: { email: 1, role: 1 } }).toArray();
+            console.log('Existing users:', JSON.stringify(users, null, 2));
+        }
+
         await mongoose.disconnect();
         console.log('Disconnected from MongoDB.');
     } catch (error) {

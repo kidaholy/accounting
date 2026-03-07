@@ -27,9 +27,9 @@ const VatDeclaration = () => {
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = parseFloat(value) || 0;
-    
+
     if (!data) return;
-    
+
     // Optimistic UI update
     const updatedData = { ...data, [name]: numValue };
     setData(updatedData);
@@ -45,85 +45,96 @@ const VatDeclaration = () => {
     }
   };
 
-  if (loading || !data) return <div className="animate-fade-in" style={{ padding: '2rem' }}>Loading...</div>;
+  if (loading || !data) return <div className="animate-slide-up" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Calculating VAT data...</div>;
 
   const outputVat = data.taxable_sales * 0.15;
   const inputVat = data.local_purchases * 0.15;
-  // Capital asset input vat logic based on the image: 48690.60 * 15% = 7303.59. Let&apos;s use 15%.
-  const capitalVat = data.capital_assets * 0.15; 
- 
-  
+  const capitalVat = data.capital_assets * 0.15;
   const totalInputVat = inputVat + capitalVat;
   const vatDue = outputVat - totalInputVat;
 
   const format = (val: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
   return (
-    <div className="animate-fade-in">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>VAT Declaration</h1>
-        <h2>Abebe Tigistu</h2>
-        <p className="subtitle" style={{ margin: 0 }}>Values are computed at 15% standard VAT rate</p>
+    <div className="animate-slide-up">
+      <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+          <span>📊</span> Tax Compliance
+        </div>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>VAT Declaration</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Standard Rate: <span className="badge badge-blue">15% VAT</span></p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-          <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            Output VAT (Sales)
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
+        <div className="card" style={{ borderTop: '4px solid var(--accent-primary)' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: 'var(--accent-primary)' }}>⬆️</span> Output VAT (Sales)
           </h3>
-          <div className="form-group">
-            <label className="form-label">Taxable Sales / Supplies (Total Amount)</label>
-            <input 
-              name="taxable_sales"
-              type="number" 
-              className="form-input" 
-              value={data.taxable_sales || ''} 
-              onChange={handleChange}
-            />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Taxable Sales / Supplies</label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.875rem' }}>ETB</span>
+                <input
+                  name="taxable_sales"
+                  type="number"
+                  style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
+                  value={data.taxable_sales || ''}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
-            <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Total Output VAT (15%):</span>
-            <span style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>{format(outputVat)}</span>
+
+          <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Total Output VAT</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{format(outputVat)}</span>
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-          <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            Input VAT (Purchases)
+        <div className="card" style={{ borderTop: '4px solid #10b981' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#10b981' }}>⬇️</span> Input VAT (Purchases)
           </h3>
-          <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label className="form-label">Local Purchases (Total Amount)</label>
-            <input 
-              name="local_purchases"
-              type="number" 
-              className="form-input" 
-              value={data.local_purchases || ''} 
-              onChange={handleChange}
-            />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Local Purchases (Total)</label>
+              <input
+                name="local_purchases"
+                type="number"
+                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
+                value={data.local_purchases || ''}
+                onChange={handleChange}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Capital Assets Purchase</label>
+              <input
+                name="capital_assets"
+                type="number"
+                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-base)', background: 'var(--bg-main)', outline: 'none', fontWeight: 600 }}
+                value={data.capital_assets || ''}
+                onChange={handleChange}
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Capital Assets Purchase (Total Amount)</label>
-            <input 
-              name="capital_assets"
-              type="number" 
-              className="form-input" 
-              value={data.capital_assets || ''} 
-              onChange={handleChange}
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
-            <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Total Input VAT (15%):</span>
-            <span style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>{format(totalInputVat)}</span>
+
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Total Input VAT</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{format(totalInputVat)}</span>
           </div>
         </div>
       </div>
 
-      <div className="summary-card highlight" style={{ textAlign: 'center' }}>
-        <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>VAT Due for Month</h3>
-        <p className="subtitle" style={{ margin: 0 }}>Output VAT - Total Input VAT</p>
-        <div className="summary-value" style={{ fontSize: '3rem', marginTop: '1rem' }}>
+      <div className="card" style={{ background: 'var(--sidebar-bg)', color: 'white', textAlign: 'center', padding: '3rem', border: 'none' }}>
+        <p style={{ color: 'var(--sidebar-text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem', marginBottom: '1rem' }}>Final Tax Liability</p>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>VAT Due to Authorities</h3>
+        <div style={{ fontSize: '4rem', fontWeight: 900, color: '#4ade80', letterSpacing: '-0.02em' }}>
           {format(vatDue)}
         </div>
+        <p style={{ color: 'var(--sidebar-text)', fontSize: '0.875rem', marginTop: '1rem' }}>Computation based on Ethiopian Tax Regulations (ETB)</p>
       </div>
     </div>
   );

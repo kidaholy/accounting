@@ -24,121 +24,101 @@ export default function Dashboard({ user }: DashboardProps) {
     await signOut({ callbackUrl: '/login' });
   };
 
-  const getRoleBadgeColor = (role?: string) => {
-    switch (role) {
-      case 'super_admin':
-        return '#ef4444';
-      case 'tenant_admin':
-        return '#3b82f6';
-      case 'accountant':
-        return '#10b981';
-      default:
-        return '#94a3b8';
-    }
-  };
+  const menuItems = [
+    { id: 'assets', label: 'Fixed Assets', icon: '💎' },
+    { id: 'vat', label: 'VAT Declaration', icon: '📊' },
+    { id: 'inventory', label: 'Stock Inventory', icon: '📦' },
+  ];
+
+  if (user.role === 'super_admin') {
+    menuItems.push({ id: 'admin', label: 'Super Admin', icon: '🛡️' });
+  }
+
+  if (user.role === 'tenant_admin') {
+    menuItems.push({ id: 'tenant-admin', label: 'Tenant Admin', icon: '🏢' });
+  }
 
   return (
-    <div className="app-container">
+    <div className="app-layout">
       {/* Sidebar Navigation */}
-      <aside className="sidebar glass-panel">
-        <div>
-          <h2>{user?.tenantName || 'Accounting System'}</h2>
-          <p className="subtitle">Cloud Accounting Platform</p>
+      <aside className="sidebar">
+        <div className="sidebar-logo">
+          <div style={{ background: 'var(--accent-primary)', width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>A</div>
+          <span>Accounting</span>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button
-            className={`nav-item ${activeTab === 'assets' ? 'active' : ''}`}
-            onClick={() => setActiveTab('assets')}
-          >
-            Fixed Assets Schedule
-          </button>
-
-          <button
-            className={`nav-item ${activeTab === 'vat' ? 'active' : ''}`}
-            onClick={() => setActiveTab('vat')}
-          >
-            VAT Declaration
-          </button>
-
-          <button
-            className={`nav-item ${activeTab === 'inventory' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inventory')}
-          >
-            Stock Inventory
-          </button>
-
-          {user.role === 'super_admin' && (
+        <nav className="sidebar-nav">
+          {menuItems.map((item) => (
             <button
-              className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('admin')}
+              key={item.id}
+              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.id)}
             >
-              Super Admin
+              <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+              {item.label}
             </button>
-          )}
-
-          {user.role === 'tenant_admin' && (
-            <button
-              className={`nav-item ${activeTab === 'tenant-admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('tenant-admin')}
-            >
-              Tenant Admin
-            </button>
-          )}
+          ))}
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--border-color)' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{user?.name}</div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{user?.email}</div>
-            <span style={{
-              display: 'inline-block',
-              marginTop: '0.5rem',
-              padding: '0.25rem 0.75rem',
-              borderRadius: '9999px',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              backgroundColor: getRoleBadgeColor(user?.role),
-              color: 'white'
-            }}>
-              {user?.role?.replace('_', ' ')}
-            </span>
-          </div>
+        <div className="sidebar-footer">
           <button
             onClick={handleSignOut}
-            className="btn"
-            style={{
-              width: '100%',
-              backgroundColor: 'transparent',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-secondary)'
-            }}
+            className="nav-item"
+            style={{ color: '#f87171' }}
           >
+            <span>🚪</span>
             Sign Out
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="main-content">
-        <div className="glass-panel" style={{ padding: '2rem', minHeight: '100%' }}>
-          {activeTab === 'assets' && <FixedAssetSchedule />}
-          {activeTab === 'vat' && <VatDeclaration />}
-          {activeTab === 'inventory' && <StockInventory />}
-          {activeTab === 'admin' && user?.role === 'super_admin' && (
-            <div>
-              <h1>Super Admin Dashboard</h1>
-              <p>Manage tenants, subscriptions, and system settings.</p>
+      <div className="main-wrapper">
+        <header className="header">
+          <div className="search-bar" style={{ flex: 1, maxWidth: 400 }}>
+            <input
+              type="text"
+              placeholder="Search anything..."
+              style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-base)', padding: '0.625rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none' }}
+            />
+          </div>
+
+          <div className="user-profile">
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{user?.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{user?.role?.replace('_', ' ')}</div>
             </div>
-          )}
-          {activeTab === 'tenant-admin' && user?.role === 'tenant_admin' && (
-            <div>
-              <h1>Tenant Admin Dashboard</h1>
-              <p>Manage users, view reports, and configure settings.</p>
+            <div className="avatar">
+              {user?.name?.charAt(0) || 'U'}
             </div>
-          )}
-        </div>
-      </main>
+          </div>
+        </header>
+
+        <main className="content-area animate-slide-up">
+          <div className="card">
+            {activeTab === 'assets' && <FixedAssetSchedule />}
+            {activeTab === 'vat' && <VatDeclaration />}
+            {activeTab === 'inventory' && <StockInventory />}
+            {activeTab === 'admin' && user?.role === 'super_admin' && (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Super Admin Dashboard</h1>
+                <p style={{ color: 'var(--text-secondary)' }}>Manage tenants, subscriptions, and system settings.</p>
+                <div style={{ marginTop: '2rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                  <div className="card" style={{ background: 'var(--bg-main)' }}><h3>12</h3><p>Total Tenants</p></div>
+                  <div className="card" style={{ background: 'var(--bg-main)' }}><h3>$4,250</h3><p>Monthly Revenue</p></div>
+                  <div className="card" style={{ background: 'var(--bg-main)' }}><h3>2</h3><p>Pending Tickets</p></div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'tenant-admin' && user?.role === 'tenant_admin' && (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Tenant Admin Dashboard</h1>
+                <p style={{ color: 'var(--text-secondary)' }}>Manage users, view reports, and configure settings.</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

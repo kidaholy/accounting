@@ -27,7 +27,7 @@ const StockInventory = () => {
 
   const updateItem = async (id: string, field: keyof InventoryItem, value: string | number) => {
     // Optimistic UI update
-    const updatedItems = items.map(item => 
+    const updatedItems = items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     );
     setItems(updatedItems);
@@ -56,8 +56,7 @@ const StockInventory = () => {
       const res = await fetch('/api/inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Send a default name to bypass mongoose requirements, user immediately edits it
-        body: JSON.stringify({ name: 'New Item', unit: '', quantity: 0, unit_cost: 0 })
+        body: JSON.stringify({ name: 'New Item', unit: 'pcs', quantity: 0, unit_cost: 0 })
       });
       const savedItem = await res.json();
       setItems(prev => prev.map(item => item.id === tempId ? { ...savedItem, isNew: false } : item));
@@ -75,7 +74,6 @@ const StockInventory = () => {
       await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
     } catch (err) {
       console.error('Failed to delete item:', err);
-      // Revert if API fails
       setItems(previousItems);
     }
   };
@@ -86,103 +84,110 @@ const StockInventory = () => {
 
   const format = (val: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
-  if (loading) return <div className="animate-fade-in" style={{ padding: '2rem' }}>Loading...</div>;
+  if (loading) return <div className="animate-slide-up" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading inventory...</div>;
 
   return (
-    <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+    <div className="animate-slide-up">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Abebe Tigistu Butcher / Siga Bet</h1>
-          <h2>Stock Inventory List</h2>
-          <p className="subtitle" style={{ margin: 0 }}>As of Sene 30/2017 E.C.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f59e0b', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <span>📦</span> Inventory
+          </div>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Stock Management</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Manage products and track real-time stock levels.</p>
         </div>
         <button className="btn btn-primary" onClick={addItem}>
-          + Add Item
+          <span>+</span> Add New Product
         </button>
       </div>
 
-      <div className="data-table-wrapper" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-        <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', position: 'relative' }}>
-          <thead style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'var(--bg-secondary)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <div className="card" style={{ borderLeft: '4px solid #f59e0b' }}>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.5rem' }}>Total Items</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{items.length}</div>
+        </div>
+        <div className="card" style={{ borderLeft: '4px solid var(--accent-primary)', gridColumn: 'span 2' }}>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.5rem' }}>Total Inventory Value</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>{format(totalCost)} ETB</div>
+        </div>
+      </div>
+
+      <div className="table-container">
+        <table className="modern-table">
+          <thead>
             <tr>
-              <th style={{ width: '50px', textAlign: 'center' }}>No</th>
-              <th style={{ width: '250px' }}>Description</th>
-              <th style={{ width: '100px' }}>Unit</th>
-              <th style={{ width: '120px', textAlign: 'right' }}>Ending Inventory</th>
-              <th style={{ width: '120px', textAlign: 'right' }}>Unit Cost</th>
-              <th style={{ width: '120px', textAlign: 'right' }}>Total Cost</th>
-              <th style={{ width: '50px', textAlign: 'center' }}></th>
+              <th style={{ width: '80px' }}>No.</th>
+              <th>Description</th>
+              <th style={{ width: '120px' }}>Unit</th>
+              <th style={{ textAlign: 'right', width: '150px' }}>Quantity</th>
+              <th style={{ textAlign: 'right', width: '150px' }}>Unit Cost</th>
+              <th style={{ textAlign: 'right', width: '180px' }}>Subtotal</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>Action</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => {
               const itemTotal = (parseFloat(String(item.quantity)) || 0) * (parseFloat(String(item.unit_cost)) || 0);
-              
+
               return (
-                <tr key={item.id} style={{ backgroundColor: 'var(--bg-panel)' }}>
-                  <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{index + 1}</td>
-                  <td style={{ padding: '0.5rem' }}>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      style={{ width: '100%', padding: '0.5rem' }}
-                      value={item.name} 
+                <tr key={item.id}>
+                  <td style={{ color: 'var(--text-muted)', fontWeight: 600 }}>#{index + 1}</td>
+                  <td>
+                    <input
+                      type="text"
+                      style={{ width: '100%', border: 'none', background: 'transparent', padding: '0.25rem', fontWeight: 700, outline: 'none', color: 'var(--text-primary)' }}
+                      value={item.name}
                       onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                      placeholder="Item name"
+                      placeholder="Item name..."
                     />
                   </td>
-                  <td style={{ padding: '0.5rem' }}>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      style={{ width: '100%', padding: '0.5rem' }}
-                      value={item.unit} 
+                  <td>
+                    <input
+                      type="text"
+                      style={{ width: '100%', border: 'none', background: 'transparent', padding: '0.25rem', color: 'var(--text-secondary)', outline: 'none' }}
+                      value={item.unit}
                       onChange={(e) => updateItem(item.id, 'unit', e.target.value)}
-                      placeholder="e.g. cart"
+                      placeholder="e.g kg"
                     />
                   </td>
-                  <td style={{ padding: '0.5rem' }}>
-                    <input 
-                      type="number" 
-                      className="form-input text-right" 
-                      style={{ width: '100%', padding: '0.5rem' }}
-                      value={item.quantity || ''} 
+                  <td style={{ textAlign: 'right' }}>
+                    <input
+                      type="number"
+                      style={{ width: '80px', textAlign: 'right', border: 'none', background: 'transparent', padding: '0.25rem', fontWeight: 600, outline: 'none' }}
+                      value={item.quantity || ''}
                       onChange={(e) => updateItem(item.id, 'quantity', e.target.value)}
                     />
                   </td>
-                  <td style={{ padding: '0.5rem' }}>
-                    <input 
-                      type="number" 
-                      className="form-input text-right" 
-                      style={{ width: '100%', padding: '0.5rem' }}
-                      value={item.unit_cost || ''} 
+                  <td style={{ textAlign: 'right' }}>
+                    <input
+                      type="number"
+                      style={{ width: '100px', textAlign: 'right', border: 'none', background: 'transparent', padding: '0.25rem', fontWeight: 600, outline: 'none' }}
+                      value={item.unit_cost || ''}
                       onChange={(e) => updateItem(item.id, 'unit_cost', e.target.value)}
                     />
                   </td>
-                  <td className="text-right" style={{ padding: '1rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                  <td style={{ textAlign: 'right', fontWeight: 800, color: 'var(--accent-primary)' }}>
                     {format(itemTotal)}
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <button 
+                    <button
                       onClick={() => removeItem(item.id)}
-                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '1.25rem' }}
-                      title="Remove Item"
+                      className="btn"
+                      style={{ padding: '0.5rem', color: 'var(--danger)', background: 'transparent' }}
+                      title="Delete Product"
                     >
-                      &times;
+                      🗑️
                     </button>
                   </td>
                 </tr>
               );
             })}
           </tbody>
-          <tfoot style={{ position: 'sticky', bottom: 0, zIndex: 1, backgroundColor: 'var(--bg-secondary)', boxShadow: '0 -2px 4px rgba(0,0,0,0.1)' }}>
-            <tr className="totals-row">
-              <td colSpan={5} style={{ padding: '1rem', textAlign: 'right', color: 'var(--text-secondary)' }}>TOTAL</td>
-              <td className="text-right" style={{ padding: '1rem', fontSize: '1.25rem' }}>{format(totalCost)}</td>
-              <td></td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+
+      <div style={{ marginTop: '1.5rem', textAlign: 'right', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+        * All costs are inclusive of applicable taxes.
       </div>
     </div>
   );
