@@ -1,7 +1,21 @@
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
 import { TenantContext, getTenantCollection } from './tenantContext';
 import connectDB from './db';
+
+// Dynamic imports for PDF generation dependencies
+let puppeteer: any;
+let chromium: any;
+
+async function loadPdfDependencies() {
+  if (!puppeteer || !chromium) {
+    try {
+      puppeteer = (await import('puppeteer-core')).default;
+      chromium = (await import('@sparticuz/chromium')).default;
+    } catch (error) {
+      throw new Error('PDF generation dependencies not available. Please ensure puppeteer-core and @sparticuz/chromium are installed.');
+    }
+  }
+  return { puppeteer, chromium };
+}
 
 // Format currency in ETB
 function formatCurrency(amount: number): string {
@@ -432,6 +446,9 @@ export async function generateReportPDF(
   context: TenantContext,
   reportId: string
 ): Promise<{ pdfBuffer: Buffer; fileName: string }> {
+  // Load PDF dependencies dynamically
+  const { puppeteer, chromium } = await loadPdfDependencies();
+  
   await connectDB();
 
   // Get report data

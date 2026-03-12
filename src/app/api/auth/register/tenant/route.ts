@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     const platformSettings = await getPlatformSettings();
     
     // Validate plan
-    const plan = platformSettings.subscriptionPlans.find(p => p.planId === planId);
+    const plan = platformSettings.subscriptionPlans.find((p: any) => p.planId === planId);
     if (!plan || !plan.isActive) {
       return NextResponse.json(
         { error: 'Invalid or inactive subscription plan' },

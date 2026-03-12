@@ -91,6 +91,7 @@ export interface BalanceSheet {
     liabilities: {
         profitTaxPayable: number;
         otherPayables: number;
+        vatPayable: number;
         loans: number;
         totalLiabilities: number;
     };

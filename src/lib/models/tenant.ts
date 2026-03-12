@@ -258,6 +258,3 @@ export function getTenantModel(tenantPrefix: string, modelName: string, schema: 
   const collectionName = `${tenantPrefix}${modelName}`;
   return mongoose.models[collectionName] || mongoose.model(collectionName, schema, collectionName);
 }
-
-// Export schemas for dynamic model creation
-export { AccountSchema, TransactionSchema, InventorySchema, FixedAssetSchema, ReportSchema };

@@ -285,7 +285,7 @@ export async function checkSubscriptionLimit(
   }
   
   const settings = await getPlatformSettings();
-  const plan = settings.subscriptionPlans.find(p => p.planId === tenant.subscription.planId);
+  const plan = settings.subscriptionPlans.find((p: any) => p.planId === tenant.subscription.planId);
   
   if (!plan) {
     throw new Error('Invalid subscription plan');

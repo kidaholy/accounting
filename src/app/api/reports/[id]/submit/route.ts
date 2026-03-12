@@ -75,7 +75,7 @@ export async function POST(
             reviewedAt: new Date(),
             comments: submissionNotes || 'Report submitted for review'
           }
-        }
+        } as any
       }
     );
     
