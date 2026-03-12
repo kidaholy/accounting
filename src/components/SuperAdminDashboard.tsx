@@ -48,6 +48,7 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
     const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
 
     const [formData, setFormData] = useState<any>({});
+    const [settings, setSettings] = useState<any>({ vat_rate: 15 });
     const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
@@ -69,6 +70,12 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                 const res = await fetch('/api/admin/users');
                 const data = await res.json();
                 setUsers(data);
+            } else if (activeTab === 'settings') {
+                const res = await fetch('/api/admin/settings');
+                const json = await res.json();
+                if (json.success) {
+                    setSettings((prev: any) => ({ ...prev, ...json.data }));
+                }
             }
         } catch (err) {
             setError('Failed to fetch data');
@@ -188,11 +195,34 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
 
     const handleSignOut = () => signOut({ callbackUrl: '/login' });
 
+    const handleUpdateSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProcessing(true);
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    key: 'vat_rate',
+                    value: settings.vat_rate,
+                    description: 'Global system-wide VAT percentage'
+                })
+            });
+            if (!res.ok) throw new Error('Failed to update settings');
+            alert('Settings updated successfully');
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     const menuItems = [
         { id: 'overview', label: 'Overview', icon: <ChevronRight size={18} /> },
         { id: 'tenants', label: 'Tenants', icon: <Building2 size={18} /> },
         { id: 'users', label: 'Users', icon: <Users size={18} /> },
         { id: 'pricing', label: 'Pricing', icon: <CreditCard size={18} /> },
+        { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
     ];
 
     return (
@@ -441,6 +471,54 @@ export default function SuperAdminDashboard({ user }: { user: any }) {
                                 </button>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {activeTab === 'settings' && (
+                    <div style={{ maxWidth: 600 }}>
+                        <div style={{ background: 'white', padding: '2.5rem', borderRadius: 24, border: '1.5px solid #E2DFD4' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                                <div style={{ width: 48, height: 48, background: 'rgba(42,74,62,0.1)', color: '#2A4A3E', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Settings size={24} />
+                                </div>
+                                <div>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1A1A1A' }}>System Configuration</h3>
+                                    <p style={{ color: '#7A7A7A', fontSize: '0.875rem' }}>Global settings that affect all tenants and transactions.</p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleUpdateSettings} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                <div style={{ background: '#F9F8F4', padding: '1.5rem', borderRadius: 16, border: '1px solid #E2DFD4' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontWeight: 800, fontSize: '0.9375rem', color: '#1A1A1A' }}>Global VAT Rate (%)</label>
+                                            <p style={{ color: '#7A7A7A', fontSize: '0.75rem', marginTop: '0.25rem' }}>The standard VAT percentage applied across the system.</p>
+                                        </div>
+                                        <div style={{ position: 'relative', width: 120 }}>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={settings.vat_rate ?? 15}
+                                                onChange={e => setSettings({ ...settings, vat_rate: e.target.value })}
+                                                style={{ width: '100%', padding: '0.75rem 2rem 0.75rem 1rem', borderRadius: 10, border: '1.5px solid #E2DFD4', fontWeight: 800, textAlign: 'right', fontSize: '1rem' }}
+                                            />
+                                            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontWeight: 800, color: '#A8A8A8' }}>%</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: '#CB6843', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                        <AlertCircle size={14} /> Changing this will affect all new reports and calculations.
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    style={{ background: '#2A4A3E', color: 'white', padding: '1rem', borderRadius: 12, border: 'none', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(42,74,62,0.2)' }}
+                                >
+                                    {processing ? 'Saving Settings...' : 'Save Global Settings'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 )}
 

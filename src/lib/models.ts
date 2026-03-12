@@ -73,6 +73,7 @@ const StockInventorySchema = new mongoose.Schema({
   unit: { type: String },
   quantity: { type: Number, default: 0 },
   unit_cost: { type: Number, default: 0 },
+  category: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -83,6 +84,7 @@ const ProductCategorySchema = new mongoose.Schema({
   name: { type: String, required: true },
   type: { type: String, enum: ['sale', 'purchase', 'expense'], required: true },
   accountCode: { type: Number },
+  hasVat: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -130,6 +132,14 @@ const AuditLogSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 
+// System Setting Schema (Global configurations)
+const SystemSettingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed, required: true },
+  description: { type: String },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // Export models (check if already compiled to avoid overwrite error in dev)
 export const Tenant = mongoose.models.Tenant || mongoose.model('Tenant', TenantSchema);
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
@@ -141,3 +151,4 @@ export const Product = mongoose.models.Product || mongoose.model('Product', Prod
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
 export const AccountBalance = mongoose.models.AccountBalance || mongoose.model('AccountBalance', AccountBalanceSchema);
 export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema);
+export const SystemSetting = mongoose.models.SystemSetting || mongoose.model('SystemSetting', SystemSettingSchema);

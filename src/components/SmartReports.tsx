@@ -46,8 +46,14 @@ export default function SmartReports() {
 
     if (!reportData) return <div style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error loading data.</div>;
 
-    const formatCurrency = (val: number) => `ETB ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    const formatPercent = (val: number) => `${val.toFixed(2)}%`;
+    const formatCurrency = (val: any) => {
+        if (val === null || val === undefined || isNaN(Number(val))) return 'ETB 0.00';
+        return `ETB ${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+    const formatPercent = (val: any) => {
+        if (val === null || val === undefined || isNaN(Number(val))) return '0.00%';
+        return `${Number(val).toFixed(2)}%`;
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -284,10 +290,10 @@ export default function SmartReports() {
                                     <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, color: '#CB6843' }}>{entry.code}</td>
                                     <td style={{ padding: '0.75rem 0.5rem', color: '#3D3D3D' }}>{entry.name}</td>
                                     <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right', fontWeight: 500 }}>
-                                        {entry.debit > 0 ? entry.debit.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'}
+                                        {entry.debit > 0 ? Number(entry.debit).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'}
                                     </td>
                                     <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right', fontWeight: 500 }}>
-                                        {entry.credit > 0 ? entry.credit.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'}
+                                        {entry.credit > 0 ? Number(entry.credit).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'}
                                     </td>
                                 </tr>
                             ))}
@@ -296,10 +302,10 @@ export default function SmartReports() {
                             <tr style={{ background: '#F9F8F6', fontWeight: 800, color: '#2A4A3E' }}>
                                 <td colSpan={2} style={{ padding: '1rem 0.5rem', textAlign: 'right', textTransform: 'uppercase' }}>Total Trial Balance</td>
                                 <td style={{ padding: '1rem 0.5rem', textAlign: 'right', borderTop: '2px double #2A4A3E' }}>
-                                    {reportData.trialBalance.totalDebit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    {Number(reportData.trialBalance.totalDebit || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </td>
                                 <td style={{ padding: '1rem 0.5rem', textAlign: 'right', borderTop: '2px double #2A4A3E' }}>
-                                    {reportData.trialBalance.totalCredit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    {Number(reportData.trialBalance.totalCredit || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </td>
                             </tr>
                         </tfoot>
@@ -344,10 +350,10 @@ export default function SmartReports() {
                             <span>Standard Taxable Sales & Services</span>
                         </div>
                         <div style={{ padding: '0.75rem', borderRight: '1px solid #333', textAlign: 'right', fontWeight: 600 }}>
-                            {reportData.vatDeclaration.box5TaxableSales.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {Number(reportData.vatDeclaration.box5TaxableSales || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </div>
                         <div style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700 }}>
-                            {reportData.vatDeclaration.box5Vat.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {Number(reportData.vatDeclaration.box5Vat || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </div>
                     </div>
 
@@ -358,10 +364,10 @@ export default function SmartReports() {
                             <span>Standard Taxable Purchases (Local & Import)</span>
                         </div>
                         <div style={{ padding: '0.75rem', borderRight: '1px solid #333', textAlign: 'right', fontWeight: 600 }}>
-                            {reportData.vatDeclaration.box10TaxablePurchases.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {Number(reportData.vatDeclaration.box10TaxablePurchases || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </div>
                         <div style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700, color: '#EF4444' }}>
-                            ({reportData.vatDeclaration.box10Vat.toLocaleString('en-US', { minimumFractionDigits: 2 })})
+                            ({Number(reportData.vatDeclaration.box10Vat || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})
                         </div>
                     </div>
 

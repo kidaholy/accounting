@@ -1,5 +1,5 @@
 import connectDB from './db';
-import { Transaction, AccountBalance, StockInventory, FixedAsset } from './models';
+import { Transaction, AccountBalance, StockInventory, FixedAsset, Tenant, SystemSetting } from './models';
 
 // Chart of Accounts Constants (Ethiopian 5-digit ledger)
 export const COA = {
@@ -28,7 +28,12 @@ export const COA = {
     EXP_PURCHASES_NON_TAXABLE: 50201,
 };
 
-export const VAT_RATE = 0.15; // Standard Ethiopian VAT
+export async function getVatRate(): Promise<number> {
+    await connectDB();
+    const setting = await SystemSetting.findOne({ key: 'vat_rate' });
+    const rate = setting ? parseFloat(setting.value) : 15;
+    return isNaN(rate) ? 0.15 : rate / 100; // Default to 15% if invalid
+}
 
 export interface VatReport {
     organizationName: string;
@@ -222,6 +227,7 @@ export async function generateBalanceSheet(tenantId: string): Promise<BalanceShe
     let accumulatedDepreciation = 0;
     let profitTaxPayable = 0;
     let otherPayables = 0;
+    let vatPayable = 0;
     let loans = 0;
     let capital = 0;
 
@@ -232,6 +238,7 @@ export async function generateBalanceSheet(tenantId: string): Promise<BalanceShe
         if (b.accountCode === COA.ASSET_ACCUM_DEP) accumulatedDepreciation += b.balance;
         if (b.accountCode === COA.LIAB_PROFIT_TAX) profitTaxPayable += b.balance;
         if (b.accountCode === COA.LIAB_AP) otherPayables += b.balance;
+        if (b.accountCode === COA.LIAB_VAT) vatPayable += b.balance;
         if (b.accountCode === COA.LIAB_LOAN) loans += b.balance;
         if (b.accountCode === COA.EQUITY_CAPITAL) capital += b.balance;
     });
@@ -240,7 +247,7 @@ export async function generateBalanceSheet(tenantId: string): Promise<BalanceShe
     const fixedAssetsNbv = fixedAssetsCost - accumulatedDepreciation;
     const totalAssets = cashAndBank + accountsReceivable + inventoryValue + fixedAssetsNbv;
 
-    const totalLiabilities = profitTaxPayable + otherPayables + loans;
+    const totalLiabilities = profitTaxPayable + otherPayables + vatPayable + loans;
     const netIncome = incomeStmt.netIncome;
     const totalEquity = capital + netIncome;
 
@@ -257,6 +264,7 @@ export async function generateBalanceSheet(tenantId: string): Promise<BalanceShe
         liabilities: {
             profitTaxPayable,
             otherPayables,
+            vatPayable,
             loans,
             totalLiabilities
         },
@@ -323,9 +331,10 @@ export async function generateVatReport(tenantId: string, startDate?: Date, endD
         }
     });
 
-    // Strictly apply standard Ethiopian VAT rate (15%)
-    const outputVat = baseSales * VAT_RATE;
-    const inputVat = basePurchases * VAT_RATE;
+    // Strictly apply standard dynamic VAT rate
+    const vatRate = await getVatRate();
+    const outputVat = baseSales * vatRate;
+    const inputVat = basePurchases * vatRate;
 
     // Mapping to formal tax form boxes (image_0.png)
     const box5TaxableSales = baseSales;
@@ -335,15 +344,21 @@ export async function generateVatReport(tenantId: string, startDate?: Date, endD
     const box15NetCredit = box5Vat - box10Vat;
 
     // Metadata for the formal form header
-    const organizationName = "Ato Abebe Tigistu"; // In production, this would come from tenant settings
-    const tin = "0000000000"; // Placeholder TIN
+    const tenant = await Tenant.findById(tenantId);
+    const organizationName = tenant?.name || "Unknown Organization";
+    const tin = (tenant as any)?.registration?.tin || "0000000000"; // TIN might be in registration subdoc if we used platform schema
+
+    // Check if we are using the simpler Tenant schema from src/lib/models.ts
+    // In src/lib/models.ts, Tenant doesn't have registration.tin, but we should support both or use platform schema
+    const finalTin = (tenant as any)?.tin || (tenant as any)?.registration?.tin || "0000000000";
+
     const period = startDate && endDate
         ? `${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`
         : "Current Period";
 
     return {
         organizationName,
-        tin,
+        tin: finalTin,
         period,
         box5TaxableSales,
         box5Vat,

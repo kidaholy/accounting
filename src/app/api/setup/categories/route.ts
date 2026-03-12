@@ -27,7 +27,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { name, type, accountCode } = await request.json();
+        const { name, type, accountCode, hasVat } = await request.json();
         if (!name || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
@@ -37,7 +37,8 @@ export async function POST(request: Request) {
             tenant: session.user.tenantId,
             name,
             type,
-            accountCode
+            accountCode,
+            hasVat: hasVat !== undefined ? hasVat : true
         });
 
         return NextResponse.json({ success: true, data: category });

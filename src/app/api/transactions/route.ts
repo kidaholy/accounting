@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import connectDB from '@/lib/db';
-import { Transaction } from '@/lib/models';
+import { Transaction, AccountBalance } from '@/lib/models';
+import { COA } from '@/lib/accountingEngine';
 
 export async function GET(request: Request) {
     try {
@@ -38,6 +39,39 @@ export async function POST(request: Request) {
             tenant: session.user.tenantId,
             ...body
         });
+
+        // Double-entry balancing: Update AccountBalances
+        // 1. Cash Impact
+        const totalAmount = (body.amount || 0) + (body.vatAmount || 0);
+        const cashImpact = body.type === 'sale' ? totalAmount : -totalAmount;
+
+        if (cashImpact !== 0) {
+            await AccountBalance.findOneAndUpdate(
+                { tenant: session.user.tenantId, accountCode: COA.ASSET_CASH },
+                {
+                    $setOnInsert: { accountType: 'asset', name: 'Cash/Bank' },
+                    $inc: { balance: cashImpact },
+                    $set: { lastUpdated: new Date() }
+                },
+                { upsert: true }
+            );
+        }
+
+        // 2. VAT Payable Impact
+        // Sales Output VAT increases liability (credit). Purchases Input VAT decreases liability (debit).
+        const vatImpact = body.type === 'sale' ? (body.vatAmount || 0) : -(body.vatAmount || 0);
+
+        if (vatImpact !== 0) {
+            await AccountBalance.findOneAndUpdate(
+                { tenant: session.user.tenantId, accountCode: COA.LIAB_VAT },
+                {
+                    $setOnInsert: { accountType: 'liability', name: 'VAT Payable' },
+                    $inc: { balance: vatImpact },
+                    $set: { lastUpdated: new Date() }
+                },
+                { upsert: true }
+            );
+        }
 
         return NextResponse.json({ success: true, data: newTransaction }, { status: 201 });
     } catch (error) {

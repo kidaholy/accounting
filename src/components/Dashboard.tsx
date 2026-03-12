@@ -10,6 +10,7 @@ import StockInventory from './StockInventory';
 import SmartReports from './SmartReports';
 import DataEntry from './DataEntry';
 import CategoryManagement from './CategoryManagement';
+import TransactionList from './TransactionList';
 
 interface User {
   name?: string | null;
@@ -55,6 +56,7 @@ export default function Dashboard({ user }: DashboardProps) {
         { id: 'payroll-entry', label: 'Payroll / Salaries', icon: <Users size={18} strokeWidth={2.5} /> },
         { id: 'utilities-entry', label: 'Utilities Expense', icon: <Zap size={18} strokeWidth={2.5} /> },
         { id: 'expense-entry', label: 'General Expenses', icon: <Wallet size={18} strokeWidth={2.5} /> },
+        { id: 'history', label: 'Transaction History', icon: <FileEdit size={18} strokeWidth={2.5} /> },
       ]
     });
 
@@ -88,6 +90,7 @@ export default function Dashboard({ user }: DashboardProps) {
     setup: 'Product & Sales Setup',
     assets: 'Fixed Asset Schedule',
     inventory: 'Stock Inventory',
+    history: 'Transaction History / Sells List',
     admin: 'Administration',
     'tenant-admin': 'Tenant Administration',
   };
@@ -196,6 +199,7 @@ export default function Dashboard({ user }: DashboardProps) {
           {activeTab === 'assets' && <FixedAssetSchedule />}
           {activeTab === 'vat' && <VatDeclaration />}
           {activeTab === 'inventory' && <StockInventory />}
+          {activeTab === 'history' && <TransactionList />}
           {activeTab === 'setup' && <CategoryManagement />}
           {activeTab === 'admin' && user?.role === 'super_admin' && (
             <div className="card" style={{ padding: '4rem 3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>

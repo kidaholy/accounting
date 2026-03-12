@@ -19,6 +19,7 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
     const [isManagingCats, setIsManagingCats] = useState(false);
     const [isAddingCat, setIsAddingCat] = useState(false);
     const [newCatName, setNewCatName] = useState('');
+    const [newCatVatApplicable, setNewCatVatApplicable] = useState(true);
 
     const [formData, setFormData] = useState({
         type: fixedType || 'sale',
@@ -28,8 +29,10 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
         description: '',
         date: new Date().toISOString().split('T')[0], // Default to today
         qty: 1,
-        unitPrice: 0
+        unitPrice: 0,
+        isVatEnabled: true // Toggle for this specific transaction
     });
+    const [vatRate, setVatRate] = useState(15);
 
     const fetchData = async () => {
         try {
@@ -45,6 +48,11 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
             if (catJson.success) setCategories(catJson.data);
             if (prodJson.success) setProducts(prodJson.data);
             if (Array.isArray(invJson)) setInventoryItems(invJson);
+
+            // Fetch VAT Rate
+            const vatRes = await fetch('/api/settings/vat');
+            const vatJson = await vatRes.json();
+            if (vatJson.success) setVatRate(vatJson.vatRate);
 
             // Set initial category if available and not fixed
             if (!fixedCategory && catJson.success && catJson.data.length > 0) {
@@ -69,7 +77,11 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
             const res = await fetch('/api/setup/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newCatName, type: fixedType || formData.type })
+                body: JSON.stringify({
+                    name: newCatName,
+                    type: fixedType || formData.type,
+                    hasVat: newCatVatApplicable
+                })
             });
             if (res.ok) {
                 setNewCatName('');
@@ -126,7 +138,7 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                 body: JSON.stringify({
                     type: formData.type,
                     amount: Number(formData.amount),
-                    vatAmount: formData.vatAmount ? Number(formData.vatAmount) : 0,
+                    vatAmount: formData.isVatEnabled ? (formData.vatAmount ? Number(formData.vatAmount) : 0) : 0,
                     category: formData.category,
                     accountCode: getAccountCode(formData.category),
                     description: formData.description,
@@ -167,14 +179,37 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
     useEffect(() => {
         if (formData.qty && formData.unitPrice) {
             const total = formData.qty * formData.unitPrice;
-            const vat = total * 0.15; // Assuming 15% VAT for automated entries
+            const vat = formData.isVatEnabled ? total * (vatRate / 100) : 0;
             setFormData(prev => ({
                 ...prev,
                 amount: total.toFixed(2),
                 vatAmount: vat.toFixed(2)
             }));
         }
-    }, [formData.qty, formData.unitPrice]);
+    }, [formData.qty, formData.unitPrice, vatRate, formData.isVatEnabled]);
+
+    // Also auto-recalculate VAT if the total amount is edited manually
+    useEffect(() => {
+        const amountNum = parseFloat(formData.amount);
+        if (!isNaN(amountNum)) {
+            const vat = formData.isVatEnabled ? amountNum * (vatRate / 100) : 0;
+            setFormData(prev => ({
+                ...prev,
+                vatAmount: vat.toFixed(2)
+            }));
+        }
+    }, [formData.amount, vatRate, formData.isVatEnabled]);
+
+    useEffect(() => {
+        if (formData.category && categories.length > 0) {
+            const cat = categories.find(c => c.name === formData.category && c.type === formData.type);
+            // Default to true if not found or not specified, but stay false if explicitly false
+            const shouldBeEnabled = cat ? cat.hasVat !== false : true;
+            if (formData.isVatEnabled !== shouldBeEnabled) {
+                setFormData(prev => ({ ...prev, isVatEnabled: shouldBeEnabled }));
+            }
+        }
+    }, [formData.category, formData.type, categories]);
 
     return (
         <div className="card" style={{ maxWidth: 600, margin: '0 auto', padding: '2rem' }}>
@@ -294,11 +329,23 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                             </optgroup>
                             {/* Inventory Items (for Sales) */}
                             {formData.type === 'sale' && inventoryItems.length > 0 && (
-                                <optgroup label="Items from Stock Management">
-                                    {inventoryItems.map(item => (
-                                        <option key={item.id} value={item.id}>{item.name} ({item.quantity} {item.unit} available)</option>
+                                <>
+                                    {/* Group items by category */}
+                                    {Object.entries(
+                                        inventoryItems.reduce((acc: any, item: any) => {
+                                            const cat = item.category || 'Uncategorized';
+                                            if (!acc[cat]) acc[cat] = [];
+                                            acc[cat].push(item);
+                                            return acc;
+                                        }, {})
+                                    ).map(([category, items]: [string, any]) => (
+                                        <optgroup key={category} label={`Stock: ${category}`}>
+                                            {items.map((item: any) => (
+                                                <option key={item.id} value={item.id}>{item.name} ({item.quantity} {item.unit} available)</option>
+                                            ))}
+                                        </optgroup>
                                     ))}
-                                </optgroup>
+                                </>
                             )}
                         </select>
                     </div>
@@ -346,12 +393,20 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                         <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', marginBottom: '0.5rem' }}>VAT Amount (ETB)</label>
                         <input
                             type="number"
-                            min="0"
-                            step="0.01"
+                            readOnly
                             value={formData.vatAmount}
-                            onChange={(e) => setFormData({ ...formData, vatAmount: e.target.value })}
-                            placeholder="15% if applicable"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1.5px solid #E2DFD4', outline: 'none' }}
+                            placeholder={formData.isVatEnabled ? `${vatRate}% (Auto)` : '0.00 (Disabled)'}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: 8,
+                                border: '1.5px solid #E2DFD4',
+                                outline: 'none',
+                                background: formData.isVatEnabled ? '#F3F4F1' : '#F9F8F6',
+                                color: formData.isVatEnabled ? '#1A1A1A' : '#A8A8A8',
+                                cursor: 'not-allowed',
+                                fontWeight: 700
+                            }}
                         />
                     </div>
                 </div>
@@ -391,6 +446,15 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                                 required
                                 autoFocus
                             />
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', fontWeight: 600, color: '#3D3D3D', cursor: 'pointer', background: '#F9F8F6', padding: '0.75rem', borderRadius: 8, border: '1px solid #E2DFD4' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={newCatVatApplicable}
+                                    onChange={(e) => setNewCatVatApplicable(e.target.checked)}
+                                    style={{ width: 18, height: 18, cursor: 'pointer' }}
+                                />
+                                VAT Applicable for this Category
+                            </label>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                                 <button type="button" onClick={() => setIsAddingCat(false)} className="btn-secondary" style={{ padding: '0.5rem 1rem' }}>Cancel</button>
                                 <button type="submit" className="btn" style={{ padding: '0.5rem 1rem' }}>Save Category</button>
@@ -411,7 +475,12 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             {categories.filter(c => c.type === (fixedType || formData.type)).map(cat => (
                                 <div key={cat._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: '#F9F8F6', borderRadius: 8, border: '1px solid #E2DFD4' }}>
-                                    <span style={{ fontWeight: 700 }}>{cat.name}</span>
+                                    <div>
+                                        <div style={{ fontWeight: 700 }}>{cat.name}</div>
+                                        <div style={{ fontSize: '0.7rem', color: cat.hasVat !== false ? '#166534' : '#991B1B', fontWeight: 800 }}>
+                                            {cat.hasVat !== false ? '✓ VAT APPLICABLE' : '✕ VAT EXEMPT'}
+                                        </div>
+                                    </div>
                                     <button onClick={() => handleDeleteCategory(cat._id)} style={{ color: '#D94F3D', background: 'transparent', border: 'none', cursor: 'pointer' }}><Trash2 size={16} /></button>
                                 </div>
                             ))}
