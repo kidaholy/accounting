@@ -123,7 +123,7 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
             'Payroll': 50102,
             'Marketing': 50103,
         };
-        return mapping[categoryName] || (formData.type === 'sale' ? 40000 : 50100);
+        return mapping[categoryName] || (formData.type === 'sale' ? 40000 : (formData.type === 'purchase' ? 50200 : 50100));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +142,7 @@ export default function DataEntry({ fixedType, fixedCategory }: DataEntryProps =
                     category: formData.category,
                     accountCode: getAccountCode(formData.category),
                     description: formData.description,
+                    quantity: Number(formData.qty),
                     date: new Date(formData.date)
                 })
             });

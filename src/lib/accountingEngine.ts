@@ -325,8 +325,9 @@ export async function generateVatReport(tenantId: string, startDate?: Date, endD
         if (tx.accountCode >= 40000 && tx.accountCode < 50000) {
             baseSales += tx.amount;
         }
-        // Base Purchases (All purchases mapped to base input pool)
-        else if (tx.accountCode === COA.EXP_PURCHASES) {
+        // Base Purchases: Capture all taxable acquisitions (Purchases & Expenses with VAT)
+        // This is more robust as it captures VAT regardless of the specific ledger code used
+        else if (tx.accountCode === COA.EXP_PURCHASES || ((tx.type === 'purchase' || tx.type === 'expense') && tx.vatAmount > 0)) {
             basePurchases += tx.amount;
         }
     });

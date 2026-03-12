@@ -106,6 +106,7 @@ const TransactionSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   amount: { type: Number, required: true }, // Amount excluding VAT
   vatAmount: { type: Number, default: 0 },
+  quantity: { type: Number, default: 1 },
   category: { type: String, required: true }, // e.g., 'Food Sales', 'Rent'
   description: { type: String }
 });

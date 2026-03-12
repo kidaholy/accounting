@@ -73,6 +73,34 @@ export async function POST(request: Request) {
             );
         }
 
+        // 3. Stock Inventory Impact
+        // Automatically create or update stock if it's a purchase or sale
+        const { StockInventory } = await import('@/lib/models');
+        const qty = Number(body.quantity || 1);
+        const description = body.description || body.category;
+
+        if (body.type === 'purchase') {
+            await StockInventory.findOneAndUpdate(
+                { tenant: session.user.tenantId, name: description },
+                {
+                    $inc: { quantity: qty },
+                    $set: {
+                        unit_cost: (body.amount || 0) / qty,
+                        updatedAt: new Date()
+                    }
+                },
+                { upsert: true, new: true }
+            );
+        } else if (body.type === 'sale') {
+            await StockInventory.findOneAndUpdate(
+                { tenant: session.user.tenantId, name: description },
+                {
+                    $inc: { quantity: -qty },
+                    $set: { updatedAt: new Date() }
+                }
+            );
+        }
+
         return NextResponse.json({ success: true, data: newTransaction }, { status: 201 });
     } catch (error) {
         console.error('Error creating transaction:', error);
