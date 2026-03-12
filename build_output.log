@@ -1,0 +1,52 @@
+
+> accounting@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/lib/pdfGenerator.ts:2:1
+Module not found: Can't resolve '@sparticuz/chromium'
+  1 | import puppeteer from 'puppeteer-core';
+> 2 | import chromium from '@sparticuz/chromium';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | import { TenantContext, getTenantCollection } from './tenantContext';
+  4 | import connectDB from './db';
+  5 |
+
+
+
+Import trace:
+  App Route:
+    ./src/lib/pdfGenerator.ts
+    ./src/app/api/reports/[id]/pdf/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./src/lib/pdfGenerator.ts:1:1
+Module not found: Can't resolve 'puppeteer-core'
+> 1 | import puppeteer from 'puppeteer-core';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import chromium from '@sparticuz/chromium';
+  3 | import { TenantContext, getTenantCollection } from './tenantContext';
+  4 | import connectDB from './db';
+
+
+
+Import trace:
+  App Route:
+    ./src/lib/pdfGenerator.ts
+    ./src/app/api/reports/[id]/pdf/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./src/lib/pdfGenerator.ts:2:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./src/lib/pdfGenerator.ts:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

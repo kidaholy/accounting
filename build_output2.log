@@ -1,0 +1,23 @@
+
+> accounting@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 12.8s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/api/auth/register/tenant/route.ts:121:58
+Type error: Parameter 'p' implicitly has an 'any' type.
+
+  119 |     
+  120 |     // Validate plan
+> 121 |     const plan = platformSettings.subscriptionPlans.find(p => p.planId === planId);
+      |                                                          ^
+  122 |     if (!plan || !plan.isActive) {
+  123 |       return NextResponse.json(
+  124 |         { error: 'Invalid or inactive subscription plan' },
+Next.js build worker exited with code: 1 and signal: null

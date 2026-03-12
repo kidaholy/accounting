@@ -9,12 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^143.0.4",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "lucide-react": "^0.577.0",
     "mongoose": "^9.2.4",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "puppeteer-core": "^24.39.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
